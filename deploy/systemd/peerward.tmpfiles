@@ -1,0 +1,4 @@
+d /etc/peerward 0750 root peerward -
+d /var/lib/peerward 0750 peerward peerward -
+d /var/lib/peerward/identity 0700 peerward peerward -
+d /run/peerward 0750 peerward peerward -

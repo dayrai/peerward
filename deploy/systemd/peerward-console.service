@@ -1,0 +1,44 @@
+[Unit]
+Description=Peerward management console
+Documentation=https://github.com/dayrai/peerward/blob/main/docs/deployment.md
+After=network-online.target peerward-control.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=peerward
+Group=peerward
+EnvironmentFile=-/etc/peerward/console.env
+Environment=PEERWARD_CONSOLE_LISTEN=127.0.0.1:8081
+Environment=PEERWARD_CONSOLE_ASSET_DIR=/usr/share/peerward-console
+ExecStart=/usr/bin/peerward-console
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=20s
+RuntimeDirectory=peerward
+RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=yes
+StateDirectory=peerward
+StateDirectoryMode=0750
+UMask=0027
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+ReadWritePaths=/var/lib/peerward /run/peerward
+
+[Install]
+WantedBy=multi-user.target

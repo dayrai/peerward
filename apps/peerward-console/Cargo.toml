@@ -1,0 +1,85 @@
+[package]
+name = "peerward-console"
+description = "Peerward management console"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[package.metadata.bundle]
+identifier = "io.github.peerward.peerward.console"
+
+[features]
+default = ["ssr"]
+ssr = [
+    "dioxus/ssr",
+    "dep:axum",
+    "dep:dioxus-history",
+    "dep:opentelemetry",
+    "dep:opentelemetry-otlp",
+    "dep:opentelemetry_sdk",
+    "dep:tokio",
+    "dep:tower-http",
+    "dep:tracing",
+    "dep:tracing-opentelemetry",
+    "dep:tracing-subscriber",
+]
+web = ["dep:dioxus-web", "dep:gloo-timers", "dep:js-sys", "dep:wasm-bindgen", "dep:web-sys"]
+
+[dependencies]
+time = { workspace = true, features = ["formatting"] }
+async-stream.workspace = true
+dioxus = { workspace = true, features = ["minimal", "router"] }
+dioxus-core.workspace = true
+dioxus-history = { version = "=0.7.10", optional = true }
+dioxus-router.workspace = true
+dioxus-web = { workspace = true, optional = true, features = ["document", "hydrate"] }
+dioxus-fullstack-core.workspace = true
+axum = { workspace = true, optional = true }
+base64.workspace = true
+futures-util.workspace = true
+hex.workspace = true
+opentelemetry = { workspace = true, optional = true }
+opentelemetry-otlp = { workspace = true, optional = true }
+opentelemetry_sdk = { workspace = true, optional = true }
+gloo-timers = { version = "0.3", features = ["futures"], optional = true }
+js-sys = { version = "=0.3.77", optional = true }
+reqwest.workspace = true
+peerward-api = { path = "../../crates/peerward-api" }
+peerward-management = { path = "../../crates/peerward-management" }
+ipnet.workspace = true
+peerward-types = { path = "../../crates/peerward-types" }
+peerward-ui = { path = "../peerward-ui" }
+qrcodegen = "1.8.0"
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, optional = true }
+toml.workspace = true
+tower-http = { version = "0.6", features = ["compression-br", "compression-gzip", "fs"], optional = true }
+tracing = { workspace = true, optional = true }
+tracing-opentelemetry = { workspace = true, optional = true }
+tracing-subscriber = { workspace = true, optional = true }
+uuid = { workspace = true, features = ["js"] }
+url.workspace = true
+wasm-bindgen = { version = "=0.2.100", optional = true }
+web-sys = { version = "=0.3.77", features = ["Clipboard", "Document", "Element", "History", "Location", "Navigator", "Node", "Window", "Storage"], optional = true }
+
+[dev-dependencies]
+axum.workspace = true
+tokio.workspace = true
+
+[[bin]]
+name = "peerward-console"
+path = "src/main.rs"
+required-features = ["ssr"]
+
+[[bin]]
+name = "peerward-console-web"
+path = "src/web.rs"
+required-features = ["web"]
+
+[lints]
+workspace = true

@@ -1,0 +1,6 @@
+# Add this override only for an installation generated with --wss-port and
+# dedicated WSS certificate/key files. One listener serves every Mesh and role.
+services:
+  relay:
+    ports:
+      - "${PEERWARD_WSS_PORT:?generate an installation with --wss-port}:8443/tcp"

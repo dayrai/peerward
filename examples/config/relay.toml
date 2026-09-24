@@ -1,0 +1,18 @@
+# Single-Mesh Relay example; shared hosts use config_version = 2.
+# Generate shared-host configuration with deploy/compose/install.py.
+config_version = 1
+relay_id = "3c93c347-909b-49f5-8f0f-bfcf697947af"
+mesh_id = "b0e8a8d2-cc6d-4d1e-ae5f-b2c86d2ad6ee"
+peer_address = "0.0.0.0:7777"
+backbone_address = "0.0.0.0:7778"
+health_address = "0.0.0.0:9090"
+private_key_file = "/var/lib/peerward/identity/noise.key"
+credential_file = "/var/lib/peerward/identity/relay.credential"
+root_public_key_file = "/var/lib/peerward/identity/root.pub"
+authority_certificate_file = "/var/lib/peerward/identity/authority.cert"
+distribution_certificate_file = "/var/lib/peerward/identity/distribution.cert"
+queue_capacity = 512
+lease_seconds = 30
+keepalive_seconds = 10
+
+# Set PEERWARD_DATABASE_URL in the service environment.

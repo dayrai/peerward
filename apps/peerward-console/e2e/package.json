@@ -1,0 +1,14 @@
+{
+  "name": "peerward-console-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test --reporter=line",
+    "test:oidc": "node run-real-oidc.mjs",
+    "test:android-web": "node run-android-web.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "1.62.1"
+  }
+}

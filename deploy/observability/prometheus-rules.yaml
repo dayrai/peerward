@@ -1,0 +1,99 @@
+groups:
+  - name: peerward-control
+    rules:
+      - alert: PeerwardControlTargetDown
+        expr: up{job="peerward-control"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: Peerward Control metrics target is unavailable
+      - alert: PeerwardPublisherStale
+        expr: peerward_control_publisher_last_success_seconds > 0 and time() - peerward_control_publisher_last_success_seconds > 120
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: Signed-state publication has not completed recently
+      - alert: PeerwardPublisherFailures
+        expr: increase(peerward_control_publisher_failures_total[10m]) > 0
+        for: 1m
+        labels: { severity: warning }
+        annotations:
+          summary: Signed-state publication is failing
+      - alert: PeerwardMaintenanceFailures
+        expr: increase(peerward_control_maintenance_failures_total[15m]) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: Bounded Control maintenance failed
+      - alert: PeerwardSseCapacityRejected
+        expr: increase(peerward_control_sse_capacity_rejections_total[10m]) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: Console event streams reached their fixed capacity
+
+      - alert: PeerwardAuditCapacityUnknown
+        expr: peerward_control_audit_storage_available == 0
+        for: 2m
+        labels: { severity: warning }
+        annotations:
+          summary: Audit storage could not be sampled; inspect database health
+
+  - name: peerward-relay
+    rules:
+      - alert: PeerwardRelayTargetDown
+        expr: up{job="peerward-relay"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: A Peerward Relay metrics target is unavailable
+      - alert: PeerwardRelayUnready
+        expr: peerward_relay_ready == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: Relay signed state or database freshness is unready
+      - alert: PeerwardRelayDatabaseGraceAtRisk
+        expr: peerward_relay_database_stale_seconds > 45
+        for: 15s
+        labels: { severity: critical }
+        annotations:
+          summary: Relay is approaching the 60-second new-session database grace boundary
+      - alert: PeerwardRelayQueuePressure
+        expr: increase(peerward_relay_host_queue_full_total[5m]) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: Relay rejected work at a bounded queue
+      - alert: PeerwardRelayAuditDrops
+        expr: increase(peerward_relay_host_audit_dropped_total[5m]) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: Relay audit batches were dropped before persistence
+      - alert: PeerwardRelayBackboneLoss
+        expr: peerward_relay_backbone_health_samples > 8 and peerward_relay_backbone_loss_permyriad > 1000
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: Aggregate Relay backbone probe loss exceeds 10 percent
+
+  - name: peerward-peer
+    rules:
+      - alert: PeerwardPeerRelayQueuePressure
+        expr: peerward_peer_relay_queue_pressure_permyriad > 8000
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: Peer Relay queue pressure exceeds 80 percent
+      - alert: PeerwardPeerNoRoute
+        expr: increase(peerward_peer_no_route_total[10m]) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: A Peer could not route authenticated traffic
+      - alert: PeerwardPeerMappingFailures
+        expr: increase(peerward_peer_gateway_mapping_failures_total[15m]) > 5 and increase(peerward_peer_gateway_mapping_successes_total[15m]) == 0
+        labels: { severity: warning }
+        annotations:
+          summary: Gateway mapping repeatedly failed without a success
+      - alert: PeerwardPeerStunFailures
+        expr: increase(peerward_peer_stun_failures_total[15m]) > 5 and increase(peerward_peer_stun_successes_total[15m]) == 0
+        labels: { severity: warning }
+        annotations:
+          summary: STUN discovery repeatedly failed without a success

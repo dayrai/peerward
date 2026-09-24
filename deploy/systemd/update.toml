@@ -1,0 +1,11 @@
+config_version = 1
+# The timer and this switch are both disabled by default. Set enabled=true and
+# explicitly enable peerward-update.timer only after replacing every placeholder.
+enabled = false
+manifest = "https://github.com/dayrai/peerward/releases/latest/download/release-manifest.json"
+signature = "https://github.com/dayrai/peerward/releases/latest/download/release-manifest.sig"
+public_key = "/etc/peerward/update.pub"
+channel = "canary"
+installation_root = "/opt/peerward"
+role = "peer"
+health_url = "unix:///run/peerward/peer.sock"

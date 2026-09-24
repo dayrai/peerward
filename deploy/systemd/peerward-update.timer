@@ -1,0 +1,12 @@
+[Unit]
+Description=Check the explicitly enabled Peerward signed-update channel
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1h
+RandomizedDelaySec=10min
+Persistent=true
+Unit=peerward-update.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,8 @@
+[advisories]
+version = 2
+yanked = "deny"
+ignore = [
+    # Transitive through openidconnect for Provider public-key JWT verification.
+    # Peerward does not hold or operate the affected RSA private key.
+    "RUSTSEC-2023-0071",
+]

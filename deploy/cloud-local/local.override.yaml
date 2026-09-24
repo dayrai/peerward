@@ -1,0 +1,11 @@
+# docker compose --env-file INSTALL/.env -f compose.yaml -f deploy/cloud-local/local.override.yaml up -d
+# Bind only to the preconfigured WireGuard address; fail if that interface is absent.
+services:
+  postgres:
+    ports: !override
+      - ${PEERWARD_LOCAL_WG_IP:-10.253.94.2}:5432:5432
+  control:
+    ports:
+      - ${PEERWARD_LOCAL_WG_IP:-10.253.94.2}:9091:9091
+  relay:
+    profiles: [cloud-host-only]

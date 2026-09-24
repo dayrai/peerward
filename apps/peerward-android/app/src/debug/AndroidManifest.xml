@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- The emulator reaches the local containerized Control through adb reverse.
+         Release builds retain the main manifest's HTTPS-only policy. -->
+    <application
+        android:usesCleartextTraffic="true"
+        tools:replace="android:usesCleartextTraffic">
+        <activity
+            android:name=".testing.NativeTestActivity"
+            android:exported="false" />
+    </application>
+</manifest>

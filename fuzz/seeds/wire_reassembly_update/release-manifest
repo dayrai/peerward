@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "sequence": 1,
+  "version": "0.1.0",
+  "channel": "canary",
+  "published_at": 1700000000,
+  "expires_at": 1700086400,
+  "schema_compatibility": {
+    "min": 4,
+    "max": 4
+  },
+  "wire_compatibility": {
+    "min": 5,
+    "max": 5
+  },
+  "rollback_floor": "0.1.0",
+  "artifacts": [
+    {
+      "platform": "linux",
+      "architecture": "x86_64",
+      "kind": "binary",
+      "name": "peerward-fixture",
+      "url": "https://example.invalid/peerward-fixture",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "size": 1
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+[package]
+name = "peerward-load"
+description = "Real Noise component load generator with evidence-safe reporting"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "peerward-load"
+path = "src/main.rs"
+
+[dependencies]
+peerward-types = { path = "../peerward-types" }
+clap.workspace = true
+peerward-wire = { path = "../peerward-wire" }
+prost.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+x25519-dalek.workspace = true
+
+[lints]
+workspace = true

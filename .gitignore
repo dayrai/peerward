@@ -1,0 +1,52 @@
+# Build outputs and local tool caches (including nested workspaces).
+target/
+build/
+dist/
+node_modules/
+.gradle/
+.kotlin/
+.venv/
+__pycache__/
+*.py[cod]
+test-results/
+playwright-report/
+/fuzz/artifacts/
+/fuzz/corpus/
+/artifacts/
+
+# Editor files and generated reports.
+.DS_Store
+.idea/
+*.iml
+*.swp
+*.tmp
+*.bak
+*.log
+
+# Private environment, signing material and local databases.
+.env
+.env.*
+.env-bootstrap-*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.apk
+*.aab
+local.properties
+
+# Local installation and device identities.
+/deploy/compose/state/
+/deploy/compose/state-*/
+/peerward-device/
+*.peerward-join/
+*.wireguard-state/

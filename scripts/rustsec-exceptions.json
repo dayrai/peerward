@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "exceptions": [
+    {
+      "id": "RUSTSEC-2023-0071",
+      "owner": "Peerward Security",
+      "scope": "OIDC Provider RSA public-key signature verification only; Peerward never performs Provider RSA private-key operations",
+      "reviewed_on": "2026-09-01",
+      "expires_on": "2026-11-30"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+[application]
+name = "Peerward Console"
+default_platform = "web"
+out_dir = "dist"
+
+[web.app]
+title = "Peerward Console"
+base_path = "/"
+
+[web.watcher]
+watch_path = ["src", "assets"]
+
+[bundle]
+identifier = "io.github.peerward.peerward.console"
+publisher = "Peerward"

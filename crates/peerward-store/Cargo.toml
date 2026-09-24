@@ -1,0 +1,53 @@
+[package]
+name = "peerward-store"
+description = "PostgreSQL persistence and transactional operations for Peerward"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[features]
+postgres-integration = []
+
+[dependencies]
+hex.workspace = true
+peerward-management = { path = "../peerward-management" }
+futures-util.workspace = true
+idna.workspace = true
+ipnet.workspace = true
+peerward-policy = { path = "../peerward-policy" }
+peerward-credentials = { path = "../peerward-credentials" }
+peerward-types = { path = "../peerward-types" }
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+sqlx.workspace = true
+thiserror.workspace = true
+time.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+ed25519-dalek.workspace = true
+
+[[test]]
+name = "postgres"
+required-features = ["postgres-integration"]
+
+[[test]]
+name = "postgres_scale"
+required-features = ["postgres-integration"]
+
+[[test]]
+name = "postgres_presence"
+required-features = ["postgres-integration"]
+
+[[test]]
+name = "postgres_provision"
+required-features = ["postgres-integration"]
+
+[lints]
+workspace = true

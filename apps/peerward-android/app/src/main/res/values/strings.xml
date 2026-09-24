@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Peerward</string>
+    <string name="vpn_channel_name">Peerward VPN</string>
+    <string name="vpn_connected">Private mesh connected</string>
+    <string name="vpn_connecting">Connecting to private mesh</string>
+    <string name="webview_message_bridge_required">Peerward requires an Android System WebView with secure message support.</string>
+    <string name="qr_scan_instruction">Scan a Peerward Join QR code</string>
+    <string name="qr_scan_invalid">Invalid Join QR (%1$s). Point the camera at another code.</string>
+</resources>

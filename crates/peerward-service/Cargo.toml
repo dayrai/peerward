@@ -1,0 +1,30 @@
+[package]
+name = "peerward-service"
+description = "Protected local service publication and loopback forwarding for Peerward"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+peerward-management = { path = "../peerward-management" }
+async-trait.workspace = true
+ed25519-dalek.workspace = true
+peerward-dataplane = { path = "../peerward-dataplane" }
+peerward-platform = { path = "../peerward-platform" }
+peerward-peer-core = { path = "../peerward-peer-core" }
+peerward-types = { path = "../peerward-types" }
+peerward-wire = { path = "../peerward-wire" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+hex.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,48 @@
+[package]
+name = "peerward-android-core"
+description = "Protocol-compatible native core for the Peerward Android client"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+peerward-management = { path = "../peerward-management" }
+peerward-carrier = { path = "../peerward-carrier" }
+base64.workspace = true
+ed25519-dalek.workspace = true
+ipnet.workspace = true
+jni.workspace = true
+libc.workspace = true
+peerward-credentials = { path = "../peerward-credentials" }
+peerward-api = { path = "../peerward-api" }
+peerward-dataplane = { path = "../peerward-dataplane" }
+peerward-directory = { path = "../peerward-directory" }
+peerward-peer-core = { path = "../peerward-peer-core" }
+peerward-p2p = { path = "../peerward-p2p" }
+peerward-service = { path = "../peerward-service" }
+peerward-types = { path = "../peerward-types" }
+peerward-wire = { path = "../peerward-wire" }
+prost.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+snow.workspace = true
+socket2.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+url.workspace = true
+x25519-dalek.workspace = true
+zeroize.workspace = true
+
+[dev-dependencies]
+peerward-policy = { path = "../peerward-policy" }
+
+[lints]
+workspace = true

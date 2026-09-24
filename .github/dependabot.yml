@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+    groups:
+      rust-security-and-maintenance:
+        patterns: ["*"]
+  - package-ecosystem: gradle
+    directory: /apps/peerward-android
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3
+  - package-ecosystem: npm
+    directory: /apps/peerward-console/e2e
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3
+  - package-ecosystem: docker
+    directory: /packaging/docker
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3

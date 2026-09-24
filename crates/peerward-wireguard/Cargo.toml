@@ -1,0 +1,25 @@
+[package]
+name = "peerward-wireguard"
+description = "Platform-neutral standard WireGuard session and carrier adapter"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+gotatun.workspace = true
+thiserror.workspace = true
+x25519-dalek.workspace = true
+zeroize.workspace = true
+
+[dev-dependencies]
+base64.workspace = true
+tokio = { workspace = true, features = ["test-util"] }
+
+[target.'cfg(target_os = "linux")'.dev-dependencies]
+tokio-tun.workspace = true
+
+[lints]
+workspace = true

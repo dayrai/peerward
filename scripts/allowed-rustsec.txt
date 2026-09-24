@@ -1,0 +1,5 @@
+# Exact cargo-audit findings reviewed for the locked graph. The audit script
+# fails when an entry disappears, changes, or is added, forcing exception cleanup.
+# Exact owner, public-key-only scope, quarterly review, and expiry are enforced
+# by scripts/rustsec-exceptions.json.
+RUSTSEC-2023-0071

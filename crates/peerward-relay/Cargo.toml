@@ -1,0 +1,62 @@
+[package]
+name = "peerward-relay"
+description = "Authenticated and fenced Peerward relay runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[features]
+postgres-integration = []
+
+[dependencies]
+peerward-management = { path = "../peerward-management" }
+peerward-carrier = { path = "../peerward-carrier" }
+peerward-credentials = { path = "../peerward-credentials" }
+peerward-directory = { path = "../peerward-directory" }
+peerward-service = { path = "../peerward-service" }
+peerward-store = { path = "../peerward-store" }
+peerward-types = { path = "../peerward-types" }
+peerward-wire = { path = "../peerward-wire" }
+peerward-p2p = { path = "../peerward-p2p" }
+opentelemetry.workspace = true
+prost.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+socket2.workspace = true
+thiserror.workspace = true
+time.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-opentelemetry.workspace = true
+toml.workspace = true
+uuid.workspace = true
+
+peerward-api = { path = "../peerward-api" }
+reqwest.workspace = true
+rand.workspace = true
+x25519-dalek.workspace = true
+zeroize.workspace = true
+futures-util.workspace = true
+tokio-util.workspace = true
+hex.workspace = true
+
+[dev-dependencies]
+sha2.workspace = true
+ed25519-dalek.workspace = true
+base64.workspace = true
+peerward-peer = { path = "../peerward-peer" }
+peerward-peer-core = { path = "../peerward-peer-core" }
+peerward-policy = { path = "../peerward-policy" }
+snow.workspace = true
+sqlx.workspace = true
+tracing-subscriber.workspace = true
+
+[[test]]
+name = "postgres_network"
+required-features = ["postgres-integration"]
+
+[lints]
+workspace = true

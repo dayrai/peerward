@@ -1,0 +1,7 @@
+config_version = 1
+http_address = "0.0.0.0:8080"
+management_address = "127.0.0.1:9090"
+max_connections = 16
+
+# Set PEERWARD_DATABASE_URL instead of placing credentials in this file.
+# Configure [[join_issuers]] from an owner-readable secret file; see docs/configuration.md.

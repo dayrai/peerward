@@ -1,0 +1,21 @@
+[package]
+name = "peerward-policy"
+description = "Bounded stateful policy evaluation for Peerward"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+ipnet.workspace = true
+peerward-types = { path = "../peerward-types" }
+thiserror.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+hex.workspace = true
+
+[lints]
+workspace = true

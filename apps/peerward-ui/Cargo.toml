@@ -1,0 +1,18 @@
+[package]
+name = "peerward-ui"
+description = "Shared accessible Peerward Dioxus application foundation"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+dioxus = { workspace = true, features = ["minimal"] }
+dioxus-core.workspace = true
+serde.workspace = true
+peerward-types = { path = "../../crates/peerward-types" }
+
+[lints]
+workspace = true

@@ -1,0 +1,10 @@
+# Consistent source checkouts, with Windows launchers rendered as CRLF.
+* text=auto eol=lf
+*.bat text eol=crlf
+
+# Checksummed inputs and retained license text must keep their original bytes.
+crates/peerward-store/migrations/*.sql -text whitespace=-blank-at-eof
+spec/** -text
+CLEAN_ROOM.md -text
+LICENSE -text whitespace=-blank-at-eof
+third_party/**/LICENSE -text whitespace=-blank-at-eof

@@ -1,0 +1,12 @@
+// Only the sandboxed native Peer service may configure systemd-resolved.
+// Other Peerward roles and arbitrary processes using the service UID are excluded.
+polkit.addRule(function(action, subject) {
+    if (subject.user === "peerward" &&
+        subject.system_unit === "peerward-peer.service" &&
+        subject.no_new_privileges === true &&
+        (action.id === "org.freedesktop.resolve1.set-dns-servers" ||
+         action.id === "org.freedesktop.resolve1.set-domains" ||
+         action.id === "org.freedesktop.resolve1.set-default-route")) {
+        return polkit.Result.YES;
+    }
+});

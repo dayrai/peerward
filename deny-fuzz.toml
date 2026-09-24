@@ -1,0 +1,7 @@
+[advisories]
+version = 2
+yanked = "deny"
+
+[sources]
+unknown-git = "deny"
+unknown-registry = "deny"

@@ -1,0 +1,36 @@
+[package]
+name = "peerward-peer-core"
+description = "Platform-neutral Peerward attachment, failover, and signed-state machine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+uuid.workspace = true
+ed25519-dalek.workspace = true
+peerward-management = { path = "../peerward-management" }
+peerward-credentials = { path = "../peerward-credentials" }
+peerward-dataplane = { path = "../peerward-dataplane" }
+peerward-directory = { path = "../peerward-directory" }
+peerward-policy = { path = "../peerward-policy" }
+peerward-types = { path = "../peerward-types" }
+peerward-wireguard = { path = "../peerward-wireguard" }
+x25519-dalek.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+peerward-wire = { path = "../peerward-wire" }
+thiserror.workspace = true
+toml.workspace = true
+tracing.workspace = true
+
+[target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
+rustix = { version = "1.1.4", default-features = false, features = ["std", "time", "fs", "net"] }
+
+
+[lints]
+workspace = true

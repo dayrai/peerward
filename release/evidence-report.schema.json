@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peerward.dev/schemas/evidence-report-v1.json",
+  "title": "Peerward stable gate evidence report envelope",
+  "$comment": "Gate-specific result fields are additionally enforced by scripts/validate-release-evidence.py.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "gate",
+    "status",
+    "evidence_binding",
+    "started_at",
+    "finished_at",
+    "environment",
+    "tool_versions",
+    "artifacts",
+    "result"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "gate": {
+      "enum": [
+        "reproducible_build_1",
+        "reproducible_build_2",
+        "android_physical_matrix",
+        "dual_relay_soak_24h",
+        "clean_room",
+        "wcag_visual",
+        "capacity",
+        "external_security_audit"
+      ]
+    },
+    "status": { "enum": ["passed", "verified", "unverified"] },
+    "evidence_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit_sha", "artifact_set_sha256"],
+      "properties": {
+        "commit_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "artifact_set_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "started_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+    "finished_at": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+    "environment": { "type": "object", "minProperties": 1 },
+    "tool_versions": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "sha256"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "pattern": "^[^/\\\\]+$" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "result": { "type": "object" }
+  }
+}

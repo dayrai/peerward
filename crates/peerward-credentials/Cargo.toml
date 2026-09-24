@@ -1,0 +1,24 @@
+[package]
+name = "peerward-credentials"
+description = "Root-anchored Ed25519 credentials for Peerward"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+ed25519-dalek.workspace = true
+libc.workspace = true
+peerward-types = { path = "../peerward-types" }
+rand.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+x25519-dalek.workspace = true
+
+[dev-dependencies]
+hex.workspace = true
+
+[lints]
+workspace = true

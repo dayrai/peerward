@@ -1,0 +1,16 @@
+{
+  "currency": "USD",
+  "peer_count": 1000,
+  "concurrent_rate": 0.25,
+  "relay_traffic_ratio": [0.2, 0.5],
+  "gib_per_active_peer_month": [5, 20],
+  "egress_price_per_gib": [0.0, 0.0],
+  "cross_region_rate": 0.25,
+  "cross_region_price_per_gib": 0.0,
+  "fixed_monthly_costs": {
+    "application_hosts": 0.0,
+    "relay_hosts": 0.0,
+    "postgresql": 0.0,
+    "ingress_and_oidc": 0.0
+  }
+}

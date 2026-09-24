@@ -1,0 +1,140 @@
+name: peerward-development
+
+x-peerward-common: &peerward-common
+  user: "${PEERWARD_UID:?run deploy/compose/bootstrap.sh}:${PEERWARD_GID:?run deploy/compose/bootstrap.sh}"
+  read_only: true
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+
+x-peerward-control-runtime: &peerward-control-runtime
+  <<: *peerward-common
+  image: peerward-runtime:0.1.0-control
+  build:
+    context: .
+    dockerfile: packaging/docker/peerward.Dockerfile
+    target: control
+
+x-peerward-relay-runtime: &peerward-relay-runtime
+  <<: *peerward-common
+  image: peerward-runtime:0.1.0-relay
+  build:
+    context: .
+    dockerfile: packaging/docker/peerward.Dockerfile
+    target: relay
+
+services:
+  postgres:
+    image: postgres:18-alpine@sha256:d3e1620b530c944afa6e887d22eb899824da68e19c52024bf98f5220c88a65b2
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:?run deploy/compose/bootstrap.sh}"
+      POSTGRES_USER: "${POSTGRES_USER:?run deploy/compose/bootstrap.sh}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?run deploy/compose/bootstrap.sh}"
+    ports:
+      - 127.0.0.1:${PEERWARD_POSTGRES_PORT:-5432}:5432
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - peerward-postgres:/var/lib/postgresql
+    networks: [database, host_access]
+    restart: unless-stopped
+
+  migrate:
+    profiles: [maintenance]
+    <<: *peerward-control-runtime
+    command: [db, migrate]
+    working_dir: /tmp
+    environment:
+      PEERWARD_DATABASE_URL: "${PEERWARD_DATABASE_URL:?run deploy/compose/bootstrap.sh}"
+    depends_on:
+      postgres: { condition: service_healthy }
+    networks: [database]
+    restart: "no"
+
+  control:
+    <<: *peerward-control-runtime
+    command: [control, run, --config, /etc/peerward/control.toml]
+    environment:
+      PEERWARD_DATABASE_URL: "${PEERWARD_DATABASE_URL:?run deploy/compose/bootstrap.sh}"
+      PEERWARD_DEV_BEARER: "${PEERWARD_DEV_BEARER:?run deploy/compose/bootstrap.sh}"
+      PEERWARD_DYNAMIC_CONFIG: /etc/peerward/dynamic.toml
+    volumes:
+      - ${PEERWARD_STATE:?run bootstrap}/control:/etc/peerward:ro
+      - ${PEERWARD_STATE}/control/meshes:/var/lib/peerward/meshes
+      - ${PEERWARD_STATE}/control/recovery:/var/lib/peerward/recovery
+    tmpfs:
+      - /run/peerward:uid=${PEERWARD_UID},gid=${PEERWARD_GID},mode=0750
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, http://127.0.0.1:9090/readyz]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - 127.0.0.1:${PEERWARD_CONTROL_PORT:-28080}:8080
+    networks: [database, application]
+    restart: unless-stopped
+
+  relay:
+    <<: *peerward-relay-runtime
+    command: [relay, run, --config, /etc/peerward/relay.toml]
+    environment:
+      PEERWARD_DATABASE_URL: "${PEERWARD_DATABASE_URL:?run deploy/compose/bootstrap.sh}"
+    volumes:
+      - ${PEERWARD_STATE}/relay:/etc/peerward:ro
+      - ${PEERWARD_STATE}/relay/meshes:/var/lib/peerward/meshes
+    tmpfs:
+      - /run/peerward:uid=${PEERWARD_UID},gid=${PEERWARD_GID},mode=0750
+    depends_on:
+      control: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, http://127.0.0.1:9090/readyz]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - ${PEERWARD_RELAY_PORT:-7777}:7777
+      - ${PEERWARD_BACKBONE_PORT:-7778}:7778
+      - ${PEERWARD_STUN_PORT:-3478}:3478/udp
+    networks: [database, application]
+    restart: unless-stopped
+
+  console:
+    image: peerward-console:0.1.0
+    build:
+      context: .
+      dockerfile: packaging/docker/console.Dockerfile
+      target: console
+    user: "${PEERWARD_UID}:${PEERWARD_GID}"
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    environment:
+      PEERWARD_CONTROL_URL: http://control:8080
+      PEERWARD_CONSOLE_LISTEN: 0.0.0.0:8081
+      PEERWARD_DEV_BEARER: "${PEERWARD_DEV_BEARER:?run deploy/compose/bootstrap.sh}"
+    tmpfs:
+      - /run/peerward:uid=${PEERWARD_UID},gid=${PEERWARD_GID},mode=0750
+    depends_on:
+      control: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, http://127.0.0.1:8081/]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - 127.0.0.1:${PEERWARD_CONSOLE_PORT:-28081}:8081
+    networks: [application]
+    restart: unless-stopped
+
+networks:
+  database:
+    internal: true
+  host_access: {}
+  application: {}
+
+volumes:
+  peerward-postgres: {}

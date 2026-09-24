@@ -1,0 +1,87 @@
+[package]
+name = "peerward-control"
+description = "Peerward management HTTP API and authorization"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[features]
+postgres-integration = []
+
+[dependencies]
+peerward-management = { path = "../peerward-management" }
+async-stream.workspace = true
+axum.workspace = true
+base64.workspace = true
+futures-util.workspace = true
+hex.workspace = true
+ipnet.workspace = true
+openidconnect.workspace = true
+opentelemetry.workspace = true
+peerward-store = { path = "../peerward-store" }
+peerward-api = { path = "../peerward-api" }
+peerward-types = { path = "../peerward-types" }
+peerward-wire = { path = "../peerward-wire" }
+peerward-credentials = { path = "../peerward-credentials" }
+peerward-directory = { path = "../peerward-directory" }
+peerward-policy = { path = "../peerward-policy" }
+peerward-service = { path = "../peerward-service" }
+prost.workspace = true
+rand.workspace = true
+serde.workspace = true
+semver.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+sqlx.workspace = true
+subtle.workspace = true
+time.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-opentelemetry.workspace = true
+toml.workspace = true
+url.workspace = true
+uuid.workspace = true
+
+zeroize.workspace = true
+tokio-rustls.workspace = true
+rustls.workspace = true
+hyper-util.workspace = true
+tower.workspace = true
+
+[dev-dependencies]
+ed25519-dalek.workspace = true
+http-body-util.workspace = true
+
+[[test]]
+name = "join_postgres"
+required-features = ["postgres-integration"]
+
+[[test]]
+name = "oidc_postgres"
+required-features = ["postgres-integration"]
+
+[[test]]
+name = "peer_delete_postgres"
+required-features = ["postgres-integration"]
+
+[[test]]
+name = "mesh_provisioning_postgres"
+required-features = ["postgres-integration"]
+
+[[test]]
+name = "mesh_delete_postgres"
+required-features = ["postgres-integration"]
+
+[[test]]
+name = "network_management_postgres"
+required-features = ["postgres-integration"]
+
+[[test]]
+name = "controlled_join_postgres"
+required-features = ["postgres-integration"]
+
+[lints]
+workspace = true

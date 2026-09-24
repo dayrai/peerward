@@ -1,0 +1,481 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Relay readiness",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "min(peerward_relay_ready)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Database stale seconds",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max(peerward_relay_database_stale_seconds)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Admitted Peer sessions (primary and standby)",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(peerward_relay_authenticated_peer_sessions)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Established backbone sessions",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(peerward_relay_authenticated_backbone_sessions)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Direct and Relay packet rates",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(peerward_peer_direct_packets_total[5m]))",
+          "legendFormat": "direct"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(peerward_peer_relay_packets_total[5m]))",
+          "legendFormat": "relay"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Path and Relay recovery events",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(peerward_peer_direct_relay_switches_total[5m]))",
+          "legendFormat": "direct/relay switches"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(peerward_peer_relay_reconnects_total[5m]))",
+          "legendFormat": "reconnects"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(rate(peerward_peer_relay_rekeys_total[5m]))",
+          "legendFormat": "rekeys"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Relay health and pressure",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "avg(peerward_relay_backbone_rtt_milliseconds)",
+          "legendFormat": "backbone RTT ms"
+        },
+        {
+          "refId": "B",
+          "expr": "avg(peerward_relay_backbone_loss_permyriad) / 100",
+          "legendFormat": "backbone loss %"
+        },
+        {
+          "refId": "C",
+          "expr": "avg(peerward_peer_relay_queue_pressure_permyriad) / 100",
+          "legendFormat": "peer queue %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "STUN and gateway mapping outcomes",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(peerward_peer_stun_successes_total[5m]))",
+          "legendFormat": "STUN success"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(peerward_peer_stun_failures_total[5m]))",
+          "legendFormat": "STUN failure"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(rate(peerward_peer_gateway_mapping_successes_total[5m]))",
+          "legendFormat": "mapping success"
+        },
+        {
+          "refId": "D",
+          "expr": "sum(rate(peerward_peer_gateway_mapping_failures_total[5m]))",
+          "legendFormat": "mapping failure"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Control publication and maintenance failures",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 21
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(peerward_control_publisher_failures_total[5m]))",
+          "legendFormat": "publisher failures"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(peerward_control_maintenance_failures_total[5m]))",
+          "legendFormat": "maintenance failures"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(rate(peerward_relay_host_queue_full_total[5m]))",
+          "legendFormat": "relay queue full"
+        },
+        {
+          "refId": "D",
+          "expr": "sum(rate(peerward_peer_no_route_total[5m]))",
+          "legendFormat": "peer no route"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Framed carrier bytes per second (not billable traffic)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 29
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(peerward_relay_framed_received_bytes_total[5m]))",
+          "legendFormat": "read"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(peerward_relay_framed_accepted_bytes_total[5m]))",
+          "legendFormat": "accepted writes"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Relay queue occupancy",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 29
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(peerward_relay_router_queued_messages)",
+          "legendFormat": "Peer messages"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(peerward_relay_backbone_pending_slots)",
+          "legendFormat": "backbone slots"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(peerward_relay_audit_pending_slots)",
+          "legendFormat": "audit slots"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Largest sampled audit table including indexes and TOAST",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 37
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max(peerward_control_audit_log_bytes and peerward_control_audit_storage_available == 1)",
+          "legendFormat": "current samples only"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Estimated audit growth (statistics resets affect baseline)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 37
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max(peerward_control_audit_log_growth_rows_per_hour and peerward_control_audit_growth_available == 1 and peerward_control_audit_storage_available == 1)",
+          "legendFormat": "estimated rows per hour"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "peerward",
+    "privacy-safe"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "Peerward Linux and Android operations",
+  "uid": "peerward-operations-v1",
+  "version": 1
+}

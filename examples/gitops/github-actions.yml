@@ -1,0 +1,42 @@
+# Copy into your configuration repository's .github/workflows directory.
+# Configure a protected environment named peerward and explicitly assign its
+# read/write machine credential as this Mesh's configuration owner in the console.
+name: Peerward network configuration
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Apply after validation and preview
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: peerward-network-configuration
+  cancel-in-progress: false
+jobs:
+  configuration:
+    runs-on: ubuntu-latest
+    environment: peerward
+    env:
+      PEERWARD_CONTROL_URL: ${{ vars.PEERWARD_CONTROL_URL }}
+      PEERWARD_MESH_ID: ${{ vars.PEERWARD_MESH_ID }}
+      PEERWARD_MACHINE_TOKEN: ${{ secrets.PEERWARD_MACHINE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      # Vendor scripts/peerward-config.py from the reviewed Peerward release.
+      - name: Validate declaration
+        run: python3 tools/peerward-config.py validate --file network.json
+      - name: Review changes against the current version
+        run: python3 tools/peerward-config.py preview --file network.json --output review.json
+      - name: Keep the exact request for diagnosis or retry
+        uses: actions/upload-artifact@v7
+        with:
+          name: peerward-configuration-review
+          path: review.json
+          retention-days: 7
+      - name: Apply the reviewed declaration
+        if: ${{ inputs.apply }}
+        run: python3 tools/peerward-config.py apply --file network.json --preview review.json

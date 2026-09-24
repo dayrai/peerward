@@ -1,0 +1,8 @@
+# Apply with compose.yaml. HTTPS terminates at the host ingress; keep loopback ports.
+services:
+  control:
+    environment:
+      PEERWARD_DEV_BEARER: !reset null
+  console:
+    environment:
+      PEERWARD_DEV_BEARER: !reset null

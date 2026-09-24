@@ -1,0 +1,40 @@
+config_version = 4
+mesh_id = "b0e8a8d2-cc6d-4d1e-ae5f-b2c86d2ad6ee"
+peer_id = "4c22809a-c2c2-4e55-b565-08a8b3c27a25"
+credential_file = "/var/lib/peerward/identity/peer.credential"
+identity_private_key_file = "/var/lib/peerward/identity/peer.identity.key"
+private_key_file = "/var/lib/peerward/identity/noise.key"
+wireguard_private_key_file = "/var/lib/peerward/identity/wireguard.key"
+root_public_key_file = "/var/lib/peerward/identity/root.pub"
+authority_certificate_files = ["/var/lib/peerward/identity/authority.cert"]
+distribution_certificate_file = "/var/lib/peerward/identity/distribution.cert"
+packet_queue_capacity = 512
+keepalive_seconds = 10
+unhealthy_after_missed = 3
+management_socket = "/run/peerward/peer.sock"
+service_state_file = "/var/lib/peerward/services.json"
+distribution_public_key = "1111111111111111111111111111111111111111111111111111111111111111"
+service_distribution_public_key = "2222222222222222222222222222222222222222222222222222222222222222"
+stun_servers = ["192.0.2.53:3478"]
+nat_mapping = "auto"
+symmetric_nat_prediction = false
+relay_pool_size = 3
+
+[[relays]]
+relay_id = "3c93c347-909b-49f5-8f0f-bfcf697947af"
+endpoints = ["tcp://203.0.113.20:7777"]
+public_key = "2222222222222222222222222222222222222222222222222222222222222222"
+
+[linux]
+interface = "pwd0"
+address = "10.94.0.10/24"
+routes = ["10.94.0.0/24"]
+dns_suffix = "mesh.peerward"
+dns_server = "10.94.0.1"
+dns_upstreams = ["1.1.1.1:53"]
+dns_backend = "auto"
+resolv_conf_path = "/etc/resolv.conf"
+platform_state_file = "/var/lib/peerward/network-state-v1.json"
+mtu = 1280
+packet_state_limit = 65536
+packet_state_shards = 16

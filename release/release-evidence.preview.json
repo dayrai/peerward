@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "release": {
+    "version": "0.1.0",
+    "channel": "canary",
+    "commit_sha": "0000000000000000000000000000000000000000",
+    "artifact_set_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "gates": {
+    "reproducible_build_1": { "status": "missing", "reason": "not attached to this technical preview" },
+    "reproducible_build_2": { "status": "missing", "reason": "not attached to this technical preview" },
+    "android_physical_matrix": { "status": "missing", "reason": "not attached to this technical preview" },
+    "dual_relay_soak_24h": { "status": "missing", "reason": "not attached to this technical preview" },
+    "clean_room": { "status": "missing", "reason": "not attached to this technical preview" },
+    "wcag_visual": { "status": "missing", "reason": "not attached to this technical preview" },
+    "capacity": { "status": "missing", "reason": "no capacity tier is declared verified" },
+    "external_security_audit": { "status": "missing", "reason": "not attached to this technical preview" }
+  }
+}

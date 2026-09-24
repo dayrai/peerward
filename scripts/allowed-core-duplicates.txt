@@ -1,0 +1,60 @@
+# Exact reviewed duplicate packages in the production workspace graph.
+# Compatibility comes from OIDC/HTTP, SQLx, Android JNI, gateway mapping, crypto,
+# and proc-macro ecosystems. A version change or new entry requires review and
+# this file update.
+base64 v0.21.7
+base64 v0.22.1
+chacha20 v0.10.2
+chacha20 v0.9.1
+cpufeatures v0.2.17
+cpufeatures v0.3.1
+crypto-common v0.1.7
+darling v0.21.3
+darling v0.23.0
+darling_core v0.21.3
+darling_core v0.23.0
+darling_macro v0.21.3
+darling_macro v0.23.0
+digest v0.10.7
+either v1.18.0
+generic-array v0.14.7
+getrandom v0.2.17
+getrandom v0.3.4
+getrandom v0.4.3
+hashbrown v0.15.5
+hashbrown v0.17.1
+itertools v0.10.5
+itertools v0.14.0
+jni-sys v0.3.1
+jni-sys v0.4.1
+# GotaTun's nix features split libc's build/normal feature graph, same release.
+log v0.4.34
+nix v0.30.1
+nix v0.31.3
+rand v0.10.2
+rand v0.8.8
+rand v0.9.5
+rand_chacha v0.3.1
+rand_chacha v0.9.0
+rand_core v0.10.1
+rand_core v0.6.4
+rand_core v0.9.5
+rustc-hash v1.1.0
+rustc-hash v2.1.3
+serde v1.0.229
+serde_core v1.0.229
+sha2 v0.10.9
+syn v2.0.119
+syn v3.0.4
+thiserror v1.0.69
+thiserror v2.0.20
+thiserror-impl v1.0.69
+thiserror-impl v2.0.20
+toml_datetime v0.6.11
+toml_datetime v1.1.1+spec-1.1.0
+toml_edit v0.22.27
+toml_edit v0.25.13+spec-1.1.0
+webpki-roots v0.26.11
+webpki-roots v1.0.9
+winnow v0.7.15
+winnow v1.0.4

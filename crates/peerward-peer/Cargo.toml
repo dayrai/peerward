@@ -1,0 +1,48 @@
+[package]
+name = "peerward-peer"
+description = "Platform-neutral Peerward peer transport session manager"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+futures-util.workspace = true
+peerward-management = { path = "../peerward-management" }
+peerward-carrier = { path = "../peerward-carrier" }
+async-trait.workspace = true
+ed25519-dalek.workspace = true
+hex.workspace = true
+ipnet.workspace = true
+peerward-dataplane = { path = "../peerward-dataplane" }
+peerward-credentials = { path = "../peerward-credentials" }
+peerward-directory = { path = "../peerward-directory" }
+peerward-platform = { path = "../peerward-platform" }
+peerward-p2p = { path = "../peerward-p2p" }
+peerward-peer-core = { path = "../peerward-peer-core" }
+peerward-policy = { path = "../peerward-policy" }
+peerward-service = { path = "../peerward-service" }
+peerward-types = { path = "../peerward-types" }
+peerward-wire = { path = "../peerward-wire" }
+opentelemetry.workspace = true
+prost.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+snow.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-opentelemetry.workspace = true
+toml.workspace = true
+uuid.workspace = true
+x25519-dalek.workspace = true
+zeroize.workspace = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+peerward-wireguard = { path = "../peerward-wireguard" }

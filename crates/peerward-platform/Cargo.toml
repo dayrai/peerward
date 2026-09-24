@@ -1,0 +1,59 @@
+[package]
+name = "peerward-platform"
+description = "Transactional Linux networking and durable local state for Peerward"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[features]
+privileged-netns = [
+    "dep:peerward-wireguard",
+    "dep:x25519-dalek",
+]
+
+[dependencies]
+peerward-management = { path = "../peerward-management" }
+peerward-credentials = { path = "../peerward-credentials" }
+async-trait.workspace = true
+futures-util.workspace = true
+ipnet.workspace = true
+libc.workspace = true
+rustix = { version = "1.1.4", default-features = false, features = ["std", "process", "net"] }
+peerward-types = { path = "../peerward-types" }
+peerward-wireguard = { path = "../peerward-wireguard", optional = true }
+rtnetlink.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+socket2.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+zbus.workspace = true
+x25519-dalek = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+tokio-tun.workspace = true
+
+[[bin]]
+name = "peerward-netns-probe"
+path = "src/bin/netns_probe.rs"
+required-features = ["privileged-netns"]
+
+[[test]]
+name = "netns"
+required-features = ["privileged-netns"]
+
+[[test]]
+name = "resource_netns"
+required-features = ["privileged-netns"]
+
+[[test]]
+name = "exit_netns"
+required-features = ["privileged-netns"]
+
+[lints]
+workspace = true

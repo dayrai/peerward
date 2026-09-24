@@ -1,0 +1,28 @@
+[package]
+name = "peerward-android-ui"
+description = "Pure Dioxus Android Peer interface"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["web"]
+web = ["dep:dioxus-web", "dep:js-sys", "dep:wasm-bindgen", "dep:web-sys"]
+
+[dependencies]
+dioxus = { workspace = true, features = ["minimal", "router"] }
+dioxus-core.workspace = true
+dioxus-router.workspace = true
+dioxus-web = { workspace = true, optional = true }
+peerward-ui = { path = "../peerward-ui" }
+serde.workspace = true
+serde_json.workspace = true
+js-sys = { version = "=0.3.77", optional = true }
+wasm-bindgen = { version = "=0.2.100", optional = true }
+web-sys = { version = "=0.3.77", features = ["MessageEvent", "Navigator", "Window"], optional = true }
+
+[lints]
+workspace = true

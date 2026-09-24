@@ -1,0 +1,16 @@
+[Unit]
+Description=Peerward signed role update
+Documentation=https://github.com/dayrai/peerward
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/bin/peerward update run-config --config /etc/peerward/update.toml
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/opt/peerward /run/peerward

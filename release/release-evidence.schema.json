@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peerward.dev/schemas/release-evidence-v1.json",
+  "title": "Peerward stable release evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "release", "gates"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "channel", "commit_sha", "artifact_set_sha256"],
+      "properties": {
+        "version": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$" },
+        "channel": { "enum": ["canary", "stable"] },
+        "commit_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "artifact_set_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reproducible_build_1",
+        "reproducible_build_2",
+        "android_physical_matrix",
+        "dual_relay_soak_24h",
+        "clean_room",
+        "wcag_visual",
+        "capacity",
+        "external_security_audit"
+      ],
+      "properties": {
+        "reproducible_build_1": { "$ref": "#/$defs/gate" },
+        "reproducible_build_2": { "$ref": "#/$defs/gate" },
+        "android_physical_matrix": { "$ref": "#/$defs/gate" },
+        "dual_relay_soak_24h": { "$ref": "#/$defs/gate" },
+        "clean_room": { "$ref": "#/$defs/gate" },
+        "wcag_visual": { "$ref": "#/$defs/gate" },
+        "capacity": { "$ref": "#/$defs/gate" },
+        "external_security_audit": { "$ref": "#/$defs/gate" }
+      }
+    }
+  },
+  "$defs": {
+    "gate": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "reason"],
+          "properties": {
+            "status": { "const": "missing" },
+            "reason": { "type": "string", "minLength": 1, "maxLength": 512 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "report",
+            "sha256",
+            "cosign_bundle",
+            "certificate_identity",
+            "certificate_oidc_issuer"
+          ],
+          "properties": {
+            "status": { "const": "passed" },
+            "report": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^evidence-[A-Za-z0-9._-]+\\.json$",
+              "description": "Relative UTF-8 JSON report path; the signed report must contain evidence_binding.commit_sha and evidence_binding.artifact_set_sha256 matching release."
+            },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "cosign_bundle": {
+              "type": "string",
+              "pattern": "^evidence-[A-Za-z0-9._-]+\\.bundle$"
+            },
+            "certificate_identity": { "type": "string", "minLength": 1 },
+            "certificate_oidc_issuer": {
+              "type": "string",
+              "pattern": "^https://[^\\s]+$"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

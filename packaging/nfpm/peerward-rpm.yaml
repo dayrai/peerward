@@ -1,0 +1,38 @@
+name: peerward
+arch: ${ARCH}
+platform: linux
+version: ${VERSION}
+section: net
+priority: optional
+maintainer: Peerward maintainers <maintainers@peerward.invalid>
+description: Peerward, an independent implementation based on open standards
+vendor: Peerward
+homepage: https://github.com/dayrai/peerward
+license: Apache-2.0
+contents:
+  - { src: target/release/peerward, dst: /usr/bin/peerward, file_info: { mode: 0755 } }
+  - { src: target/release/peerward-console, dst: /usr/bin/peerward-console, file_info: { mode: 0755 } }
+  - { src: apps/peerward-console/dist, dst: /usr/share/peerward-console }
+  - { src: deploy/systemd/peerward-control.service, dst: /usr/lib/systemd/system/peerward-control.service }
+  - { src: deploy/systemd/peerward-relay.service, dst: /usr/lib/systemd/system/peerward-relay.service }
+  - { src: deploy/systemd/peerward-peer.service, dst: /usr/lib/systemd/system/peerward-peer.service }
+  - { src: deploy/systemd/peerward-console.service, dst: /usr/lib/systemd/system/peerward-console.service }
+  - { src: deploy/systemd/peerward-update.service, dst: /usr/lib/systemd/system/peerward-update.service }
+  - { src: deploy/systemd/peerward-update.timer, dst: /usr/lib/systemd/system/peerward-update.timer }
+  - { src: deploy/systemd/update.toml, dst: /etc/peerward/update.toml, type: config|noreplace }
+  - { src: deploy/systemd/peerward.sysusers, dst: /usr/lib/sysusers.d/peerward.conf }
+  - { src: deploy/systemd/peerward.tmpfiles, dst: /usr/lib/tmpfiles.d/peerward.conf }
+  - { src: deploy/systemd/50-peerward-resolved.rules, dst: /usr/share/polkit-1/rules.d/50-peerward-resolved.rules }
+  - { src: examples/config/control.toml, dst: /etc/peerward/control.toml, type: config|noreplace }
+  - { src: examples/config/relay.toml, dst: /etc/peerward/relay.toml.example }
+  - { src: examples/config/peer.toml, dst: /etc/peerward/peer.toml.example }
+  - { src: LICENSE, dst: /usr/share/doc/peerward/LICENSE }
+  - { src: third_party, dst: /usr/share/doc/peerward/third_party }
+  - { src: README.md, dst: /usr/share/doc/peerward/README.md }
+scripts:
+  postinstall: packaging/nfpm/scripts/postinstall.sh
+  preremove: packaging/nfpm/scripts/preremove.sh
+  postremove: packaging/nfpm/scripts/postremove.sh
+depends: [ca-certificates, iproute, nftables, "polkit >= 124"]
+rpm:
+  compression: xz

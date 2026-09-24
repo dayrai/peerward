@@ -1,0 +1,78 @@
+[package]
+name = "peerward-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+license = "Apache-2.0"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+peerward-carrier = { path = "../crates/peerward-carrier" }
+peerward-credentials = { path = "../crates/peerward-credentials" }
+peerward-dataplane = { path = "../crates/peerward-dataplane" }
+peerward-directory = { path = "../crates/peerward-directory" }
+peerward-p2p = { path = "../crates/peerward-p2p", features = ["fuzzing"] }
+peerward-policy = { path = "../crates/peerward-policy" }
+peerward-service = { path = "../crates/peerward-service" }
+peerward-types = { path = "../crates/peerward-types" }
+peerward-updater = { path = "../crates/peerward-updater" }
+peerward-wire = { path = "../crates/peerward-wire" }
+peerward-wireguard = { path = "../crates/peerward-wireguard" }
+x25519-dalek = { version = "2", features = ["static_secrets"] }
+prost = "0.14"
+serde_json = "1"
+
+[[bin]]
+name = "credential_codecs"
+path = "fuzz_targets/credential_codecs.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "gateway_mapping_codecs"
+path = "fuzz_targets/gateway_mapping_codecs.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "packet_and_directory"
+path = "fuzz_targets/packet_and_directory.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "v2_documents"
+path = "fuzz_targets/v2_documents.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "wire_reassembly_update"
+path = "fuzz_targets/wire_reassembly_update.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "wireguard_and_stun"
+path = "fuzz_targets/wireguard_and_stun.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "quic_fragments"
+path = "fuzz_targets/quic_fragments.rs"
+test = false
+doc = false
+bench = false

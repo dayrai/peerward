@@ -1,0 +1,12 @@
+[application]
+name = "Peerward"
+default_platform = "android"
+out_dir = "dist"
+
+[web.app]
+title = "Peerward"
+base_path = "/assets/dioxus"
+
+[bundle]
+identifier = "io.github.peerward.peerward"
+publisher = "Peerward"

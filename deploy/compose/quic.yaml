@@ -1,0 +1,6 @@
+# Enable only for an installation generated with --quic-port and TLS files.
+# UDP and TCP 443 can coexist; one UDP listener serves all Meshes and roles.
+services:
+  relay:
+    ports:
+      - "${PEERWARD_QUIC_PORT:?generate an installation with --quic-port}:8443/udp"

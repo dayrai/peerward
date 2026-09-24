@@ -1,0 +1,7 @@
+services:
+  console:
+    environment:
+      PEERWARD_CONTROL_URL: http://host.docker.internal:38080
+      PEERWARD_DEV_BEARER: !reset null
+    extra_hosts:
+      - host.docker.internal:host-gateway

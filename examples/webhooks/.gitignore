@@ -1,0 +1,4 @@
+/.venv/
+/webhook-inbox.sqlite
+/webhook-inbox.sqlite-wal
+/webhook-inbox.sqlite-shm

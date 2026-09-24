@@ -1,0 +1,6 @@
+product_version = "0.1.0"
+android_version_code = 4
+schema_version = 4
+wire_major = 5
+rollback_floor = "0.1.0"
+channel = "canary"
