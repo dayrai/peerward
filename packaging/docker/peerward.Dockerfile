@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     cargo build --locked --release -p peerward-cli && \
     install -Dm0755 target/release/peerward /out/peerward
 
-FROM debian:bookworm-slim@sha256:88200866dfff7ea7f5cbcb6ec7c8a701889efe6fe859fe64d6990e4b07ea4171 AS peerward-runtime
+FROM debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251 AS peerward-runtime
 LABEL org.opencontainers.image.source="https://github.com/dayrai/peerward" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.title="Peerward unified runtime" \
