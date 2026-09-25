@@ -8,7 +8,7 @@
     "test:android-web": "node run-android-web.mjs"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.10.2",
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "1.62.1"
   }
 }
