@@ -13,6 +13,7 @@ x-peerward-control-runtime: &peerward-control-runtime
     context: .
     dockerfile: packaging/docker/peerward.Dockerfile
     target: control
+    network: ${PEERWARD_BUILD_NETWORK:-default}
 
 x-peerward-relay-runtime: &peerward-relay-runtime
   <<: *peerward-common
@@ -21,6 +22,7 @@ x-peerward-relay-runtime: &peerward-relay-runtime
     context: .
     dockerfile: packaging/docker/peerward.Dockerfile
     target: relay
+    network: ${PEERWARD_BUILD_NETWORK:-default}
 
 services:
   postgres:
@@ -108,6 +110,7 @@ services:
       context: .
       dockerfile: packaging/docker/console.Dockerfile
       target: console
+      network: ${PEERWARD_BUILD_NETWORK:-default}
     user: "${PEERWARD_UID}:${PEERWARD_GID}"
     read_only: true
     security_opt: [no-new-privileges:true]
