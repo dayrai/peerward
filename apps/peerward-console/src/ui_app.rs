@@ -144,38 +144,24 @@ fn Workflow(
             }
         },
         ConsoleRoute::Policy => rsx! {
-            ConsoleAccessPanel{requested_resource,requested_source,key:"{snapshot.mesh_id}",mesh:snapshot.mesh_id.clone(),locale,csrf:snapshot.csrf_token.clone(),can_write:can_write}
+            section { class: "card policy-entry",
+                div {
+                    h2 { {console_text(locale,"设备之间的通信","Communication between devices")} }
+                    p { class:"muted", {console_text(locale,"让两台设备互相 Ping，或允许 SSH、网页等连接。选择设备后保存即可。","Allow Ping, SSH or web connections between devices. Choose the devices, then save.")} }
+                }
+                button { class:"primary-button", disabled:!browser_ready(), onclick:move |_| advanced_open.set(true),
+                    {if can_write {console_text(locale,"配置设备互通","Configure device access")} else {console_text(locale,"查看通信规则","View communication rules")}}
+                }
+            }
+            ConsoleAccessPanel{requested_resource,requested_source,mesh:snapshot.mesh_id.clone(),locale,csrf:snapshot.csrf_token.clone(),can_write:can_write}
             div { class: "advanced-entryline", id: "advanced-access",
                 button { class: "text-link", onclick: move |_| advanced_open.set(true),
                     if can_write { {console_text(locale,"高级访问工具…","Advanced access tools…")} } else { {console_text(locale,"高级访问信息…","Advanced access information…")} }
                 }
             }
             if advanced_open() {
-                ConsoleOverlay { wide: true, title: if can_write { console_text(locale,"高级访问工具","Advanced access tools") } else { console_text(locale,"高级访问信息","Advanced access information") }, on_close: move |()| advanced_open.set(false),
-                    div { class: "advanced-drawer-intro",
-                        strong {
-                            if can_write { {console_text(locale,"这里直接操作底层访问规则","These tools operate on the underlying access-rule model")} }
-                            else { {console_text(locale,"这里以只读方式查看底层访问规则","Review the underlying access-rule model in read-only mode")} }
-                        }
-                        p { class:"muted", {console_text(locale,"已有高级 Allow / Deny、优先级或复杂选择器时，不会用简化结果静默覆盖。","Existing advanced Allow / Deny, priorities, or complex selectors are never silently replaced by the simplified view.")} }
-                    }
-                    section { class: if show_action_panel { "resource-workspace support-workspace" } else { "resource-workspace resource-workspace--read-only support-workspace" },
-                        div { class: "resource-list-column",
-                            section { class: "card",
-                                h2 { {console_message(locale, "ordered-policy")} }
-                                p { {console_message(locale, "policy-help")} }
-                                ResourceTable { title: console_message(locale, "policy-document"), resources: snapshot.resources, next_cursor: None, locale }
-                            }
-                        }
-                        if show_action_panel {
-                            aside { class: "resource-action-column", aria_label: console_message(locale, "resource-actions"),
-                                {action_panel}
-                            }
-                        }
-                        div { class: "resource-extras-column",
-                            {resource_extras}
-                        }
-                    }
+                ConsoleOverlay { wide: true, title: console_text(locale,"访问规则","Access rules"), on_close: move |()| advanced_open.set(false),
+                    ConsolePolicyEditor { key:"{snapshot.mesh_id}", mesh:snapshot.mesh_id.clone(), csrf:snapshot.csrf_token.clone(), locale, can_write, lookups:snapshot.lookups.clone(), extras:resource_extras }
                 }
             }
         },

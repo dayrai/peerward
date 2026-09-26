@@ -45,6 +45,12 @@ async function selectResource(page, id) {
 }
 
 async function waitForBrowser(page) {
+  if (new URL(page.url()).pathname === '/policy') {
+    await expect(page.locator('main')).toHaveAttribute('data-console-ready', 'true');
+    await page.getByRole('button', { name: 'Configure device access', exact: true }).click();
+    await expect(page.locator('.policy-savebar')).toContainText('All rules saved');
+    return;
+  }
   await expect(page.getByRole("region", { name: "Resource actions" }))
     .toHaveAttribute("data-browser-ready", "true");
 }
@@ -326,7 +332,7 @@ test("real PostgreSQL 18 CRUD, multi-endpoint Relay, policy v2, join secret, aud
 
   await navigate(page, "Policy");
   const policy = await api(page, `/api/v1/meshes/${primaryMesh}/policy`);
-  await page.getByLabel("Policy revision").fill(String(Number(policy.revision) + 1));
+  await page.getByText('Advanced rule editing', { exact: true }).click();
   await page.getByLabel("Default action").selectOption("deny");
   const ruleId = crypto.randomUUID();
   await page.locator("summary").filter({ hasText: "Advanced JSON import/export" }).click();
@@ -341,11 +347,9 @@ test("real PostgreSQL 18 CRUD, multi-endpoint Relay, policy v2, join secret, aud
     protocol: "any",
     destination_ports: [],
   }]));
-  await page.getByRole("button", { name: "Replace policy" }).click();
-  await expect(page.getByRole("table", { name: "Policy document visible to the current role" }))
-    .toContainText("default_action");
-  await expect(page.getByRole("table", { name: "Policy document visible to the current role" }))
-    .toContainText("deny");
+  await page.getByRole("button", { name: "Save rules", exact: true }).click();
+  await expect(page.locator('.policy-savebar')).toContainText('Rules saved');
+  expect((await api(page, `/api/v1/meshes/${primaryMesh}/policy`)).revision).toBe(policy.revision + 1);
   await expect.poll(async () => (await api(page, `/api/v1/meshes/${primaryMesh}/policy`)).rules[0]?.id).toBe(ruleId);
   const replacedPolicy = await api(page, `/api/v1/meshes/${primaryMesh}/policy`);
   expect(replacedPolicy.rules[0].id).toBe(ruleId);

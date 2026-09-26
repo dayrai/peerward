@@ -64,6 +64,7 @@ fn console_api_error(locale: Locale, error: ConsoleApiError) -> String {
             false,
         ),
         "revision_conflict"
+        | "revision_rollback"
         | "version_conflict"
         | "configuration_revision_conflict"
         | "preview_stale"

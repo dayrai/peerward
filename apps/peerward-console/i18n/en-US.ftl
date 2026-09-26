@@ -632,3 +632,5 @@ policy-priority-help = Lower priorities match first; ties prefer deny, then rule
 
 relay-region = Relay region (lowercase letters, digits or hyphens)
 relay-routing-weight = Routing weight (1–1000)
+invalid-policy-draft = The rule draft is invalid or its priority limit has been reached. Review the advanced editor; existing rules are retained.
+invalid-policy-devices = Choose two different valid devices.

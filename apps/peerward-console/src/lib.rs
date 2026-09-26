@@ -33,6 +33,7 @@ include!("invitation_lifecycle.rs");
 include!("authority_import.rs");
 include!("forms.rs");
 include!("resource_editor.rs");
+include!("console_policy_editor.rs");
 include!("resource_table.rs");
 include!("mesh_summary.rs");
 include!("bulk_actions.rs");
@@ -55,6 +56,9 @@ mod tests;
 
 #[cfg(test)]
 mod network_panel_tests;
+
+#[cfg(test)]
+mod policy_editor_tests;
 
 include!("join_application_panel.rs");
 include!("enrollment_complete.rs");

@@ -90,6 +90,10 @@ access, device editing, all three sharing wizards, effective access, pause/resum
 grant revocation/restoration for all three resource kinds, service transport/address
 conditions, group-search navigation, issue acknowledgement, target editing with gateway reapproval,
 gateway priority/approval changes, and preserving conflicting drafts.
+`policy-editor.spec.mjs` covers selecting named devices, bidirectional ICMP rules,
+automatic policy loading and revision management, validate-only versus saving,
+preserving existing rules, conflict and failure recovery, unsaved-close protection,
+and the persistent save controls on mobile. It only writes to the disposable fixture.
 `prototype-pages.spec.mjs` additionally covers the network portfolio and creation
 centered modal with a persisted unique identifier, versioned network settings, conflict reload, exact-name deletion with
 pending progress, device-condition scope preservation, a matrix across devices,

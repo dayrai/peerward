@@ -19,10 +19,12 @@ export async function openAdvancedTools(page) {
   const label = labels[url.pathname];
   if (!label || !url.searchParams.has('mesh')) return;
   await expect(page.locator('main')).toHaveAttribute('data-console-ready', 'true');
-  if (await page.getByRole('dialog', { name: label.slice(0, -1), exact: true }).isVisible()) return;
+  const dialogName = url.pathname === '/policy' ? 'Access rules' : label.slice(0, -1);
+  if (await page.getByRole('dialog', { name: dialogName, exact: true }).isVisible()) return;
   if (url.pathname === "/peers" && !await page.getByRole("button", { name: label, exact: true }).isVisible()) {
     await page.locator(".device-more > summary").click();
   }
   await page.getByRole('button', { name: label, exact: true }).click();
-  await expect(page.getByRole('dialog', { name: label.slice(0, -1), exact: true })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: dialogName, exact: true })).toBeVisible();
+  if (url.pathname === '/policy') await page.getByText('Resource rules and device groups', { exact: true }).click();
 }

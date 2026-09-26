@@ -632,3 +632,5 @@ policy-priority-help = 数字越小越先匹配；同优先级时拒绝优先，
 
 relay-region = Relay 区域（小写字母、数字或连字符）
 relay-routing-weight = 路由权重（1–1000）
+invalid-policy-draft = 规则格式不完整或优先级已达上限，请检查高级规则编辑中的内容；原规则已保留。
+invalid-policy-devices = 请选择两台不同的有效设备。
