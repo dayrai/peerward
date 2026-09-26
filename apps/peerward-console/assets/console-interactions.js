@@ -44,7 +44,8 @@ window.addEventListener('blur', () => { clickPicker = null; });
 const submissionInProgress = () => [...document.querySelectorAll(
   '[role="dialog"][aria-modal="true"],[role="alertdialog"][aria-modal="true"]'
 )].filter(node => node.isConnected && node.getClientRects().length > 0 && node.getAttribute('aria-hidden') !== 'true')
-  .at(-1)?.querySelector('[data-console-submitting="true"]') != null;
+  .at(-1)?.querySelector('[data-console-submitting="true"]') != null
+  || document.querySelector('.access-page [data-console-submitting="true"]') != null;
 
 document.addEventListener('click', event => {
   const target = event.target instanceof Element ? event.target : null;

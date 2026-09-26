@@ -185,3 +185,12 @@ automated keyboard tests pass; see
 
 `device-prototype.spec.mjs` 验证原型设备列表结构以及真实服务计数、IP / 标签搜索、导出、
 设备详情 / 访问来源 / 添加设备跳转和手机可访问性；桌面截图使用 1920 × 1130，视觉基线由本目录的快照测试维护。
+
+`access-prototype.spec.mjs` covers the reference Access layout (separate source picker,
+source-by-share matrix, inline explanation and condition simulator), real grant
+preview/apply, source changes, retained selection while searching, unsaved grant
+protection, evaluation failure recovery, and mobile overflow/accessibility. It
+captures the static reference and live disposable fixture at 1920 × 1130; reference
+sample data is used only for visual comparison. The default-policy banner uses the
+actual policy, including legacy allow defaults. Run it with
+`PEERWARD_CONSOLE_E2E_GREP='access prototype' scripts/test-console-v14.sh`.

@@ -1,6 +1,7 @@
 #[component]
 fn ConsoleAccessPanel(
     mesh: String,
+    #[props(default)] mesh_name: String,
     locale: Locale,
     csrf: Option<String>,
     can_write: bool,
@@ -18,7 +19,9 @@ fn ConsoleAccessPanel(
     let mut resource_search = use_signal(String::new);
     let mut cursor = use_signal(String::new);
     let mut selected = use_signal(|| None::<peerward_api::ConsoleSharingResource>);
-    let mut selected_result = use_signal(|| None::<peerward_api::ConsoleMatrixCell>);
+    let mut grant_open = use_signal(|| false);
+    let mut locally_selected = use_signal(|| false);
+    let policy = use_console_query::<PolicyPutRequest>(format!("/api/v1/meshes/{mesh}/policy"));
     let mut focused_resource = use_signal(String::new);
     let requested_share = use_console_query::<Page<peerward_api::ConsoleSharingResource>>(
         if requested_resource.is_empty() {
@@ -55,6 +58,8 @@ fn ConsoleAccessPanel(
     #[cfg(target_arch = "wasm32")]
     let source_resource = requested_resource.clone();
     let select_source = use_callback(move |value: String| {
+        selected.set(None);
+        locally_selected.set(true);
         source.set(value.clone());
         #[cfg(target_arch = "wasm32")]
         navigator.replace(
@@ -75,6 +80,7 @@ fn ConsoleAccessPanel(
         if fixed_source.is_none()
             && (requested.is_empty() || parse_console_source(&requested).is_some())
         {
+            if *source.peek() != requested { locally_selected.set(false); }
             source.set(requested);
         }
     }));
@@ -202,8 +208,58 @@ fn ConsoleAccessPanel(
             targets
         }),
     );
+    let active_source = source();
+    use_effect(use_reactive((&active_source,), move |_| selected.set(None)));
+    // Recompute the explanation from the latest matrix, including after grant changes.
+    let current_result = selected().and_then(|resource| result.read().as_ref()
+        .and_then(|r| r.as_ref().ok())
+        .and_then(|matrix| matrix.cells.iter().find(|cell| cell.id == resource.id).cloned()));
+    let source_label = devices.read().as_ref().and_then(|r| r.as_ref().ok())
+        .and_then(|page| page.items.iter().find(|peer| source() == format!("peer:{}", peer.id)))
+        .map(|peer| if peer.display_name.is_empty() { peer.name.clone() } else { peer.display_name.clone() })
+        .or_else(|| requested_peer.read().as_ref().and_then(|r| r.as_ref().ok())
+            .filter(|peer| source() == format!("peer:{}", peer.id))
+            .map(|peer| if peer.display_name.is_empty() { peer.name.clone() } else { peer.display_name.clone() }))
+        .or_else(|| groups.read().as_ref().and_then(|r| r.as_ref().ok())
+            .and_then(|page| page.items.iter().find(|group| source() == format!("group:{}", group.id)))
+            .map(|group| group.name.clone()))
+        .or_else(|| requested_group.read().as_ref().and_then(|r| r.as_ref().ok())
+            .filter(|group| source() == format!("group:{}", group.id)).map(|group| group.definition.name.clone()))
+        .unwrap_or_else(|| console_text(locale, "当前来源", "Current source").into());
     rsx! {
-        section { class: "card access-workspace",
+        div { class: "access-page",
+        if fixed_source.is_none() {
+            div { class: "page-head access-page-head",
+                div {
+                    div { class: "eyebrow", "{mesh_name}" }
+                    h1 { {console_text(locale, "访问", "Access")} }
+                    p { {console_page_description(locale, ConsoleRoute::Policy)} }
+                }
+                if can_write {
+                    button { class: "primary-button", onclick: move |_| grant_open.set(true),
+                        {console_text(locale, "＋ 添加授权", "＋ Add grant")}
+                    }
+                }
+            }
+            section { class: "card access-default",
+                span { class: "access-default-icon", aria_hidden: "true", dangerous_inner_html: include_str!("../assets/icons/check-lg.svg") }
+                div {
+                    if let Some(Ok(current)) = policy.read().as_ref() {
+                        if current.default_action == "deny" {
+                            strong { {console_text(locale, "默认拒绝已开启", "Default deny is enabled")} }
+                            small { {console_text(locale, "没有明确授权，就不能访问共享。先选来源，再看它对每个共享的最终结果。", "Select a source to see its final access result for each share. Access requires an explicit grant.")} }
+                        } else {
+                            strong { {console_text(locale, "设备通信的默认策略为允许", "Device communication is allowed by default")} }
+                            small { {console_text(locale, "当前网络使用自定义策略，请以各共享的最终访问结果为准。", "This network uses a custom policy. Review each share’s effective access result.")} }
+                        }
+                    } else {
+                        strong { {console_text(locale, "访问由当前规则决定", "Access is determined by current rules")} }
+                        small { {console_text(locale, "选择来源，查看它对每个共享的最终结果。", "Select a source to see the final result for each share.")} }
+                    }
+                }
+            }
+        }
+        section { class: "card access-source-card",
             div { class: "access-source-section",
                 if let Some(id) = fixed_source {
                     h2 { {console_text(locale, "这台设备可以访问什么", "What this device can access")} }
@@ -221,13 +277,13 @@ fn ConsoleAccessPanel(
                         }
                     }
                 } else {
-                    h2 { {console_text(locale, "谁可以访问什么", "Who can access what")} }
+                    h2 { {console_text(locale, "先选择访问来源", "Select an access source first")} }
                     p { class: "muted",
                         {
                             console_text(
                                 locale,
-                                "先选择设备或设备组，再看它对每个共享的最终结果。未明确允许的访问会被阻止。",
-                                "Choose a device or group first, then review its final result for each share. Access that is not explicitly allowed is blocked.",
+                                "可以选择单台设备或设备组；搜索只用来缩小候选范围。",
+                                "Select a device or group; search only narrows the available choices.",
                             )
                         }
                     }
@@ -239,13 +295,14 @@ fn ConsoleAccessPanel(
                             id: "access-source-search",
                             value: source_search,
                             placeholder: console_text(locale, "搜索设备或设备组", "Search devices or groups"),
-                            oninput: move |e| { source_search.set(e.value()); select_source.call(String::new()); },
+                            oninput: move |e| source_search.set(e.value()),
                         }
-                        label { class: "sr-only", r#for: "access-source",
-                            {console_text(locale, "来源设备或组", "Source device or group")}
+                        label { r#for: "access-source",
+                            {console_text(locale, "设备或设备组", "Device or group")}
                         }
                         select {
                             id: "access-source",
+                            "data-console-selection": "true",
                             value: source,
                             onchange: move | e | select_source.call(e.value()),
                             option { value: "",
@@ -311,7 +368,7 @@ fn ConsoleAccessPanel(
                     }
                 }
             }
-            if fixed_source.is_none() && !requested_source.is_empty() && source() == requested_source {
+            if fixed_source.is_none() && !locally_selected() && !requested_source.is_empty() && source() == requested_source {
                 if let Some(id) = requested_peer_id {
                     div { class: "access-focus-banner access-context-banner",
                         div {
@@ -362,8 +419,13 @@ fn ConsoleAccessPanel(
                     }
                 }
             }
+        }
+        section { class: "card access-workspace",
             div { class: "panel-head access-matrix-head",
-                h2 { {console_text(locale, "访问结果", "Access results")} }
+                div {
+                    h2 { {console_text(locale, "访问结果", "Access results")} }
+                    p { class: "muted", {console_text(locale, "只显示当前来源对各共享的最终结果。点击结果查看原因或修改授权。", "The current source’s final result for each share. Select a result to review or change grants.")} }
+                }
                 div { class: "actions",
                     label { class: "sr-only", r#for: "access-resource-search",
                         {console_text(locale, "搜索共享", "Search shares")}
@@ -414,7 +476,7 @@ fn ConsoleAccessPanel(
                     }
                 } else {
                     div { class: "access-empty-selection",
-                        span { aria_hidden: "true", "1" }
+                        span { class: "access-empty-icon", aria_hidden: "true", dangerous_inner_html: include_str!("../assets/icons/arrow-up-left.svg") }
                         div {
                             strong { {console_text(locale, "先选择一台设备或设备组", "Choose a device or group first")} }
                             p { class: "muted", {console_text(locale, "上面的搜索只用来缩小候选范围；选中来源后，这里只显示它对共享的最终访问结果。", "Use the search above to narrow the choices. After selecting a source, this area shows only its final access results for shares.")} }
@@ -459,67 +521,58 @@ fn ConsoleAccessPanel(
                     }
                 } else {
                     div { class: "matrix-scroll",
-                        table { class: "access-results-table",
-                            caption { class: "sr-only",
-                                {console_text(locale, "所选来源的有效访问权限", "Effective access for selected source")}
-                            }
+                        table { class: "access-permission-matrix",
+                            caption { class: "sr-only", {console_text(locale, "所选来源的有效访问权限", "Effective access for selected source")} }
                             thead {
                                 tr {
-                                    th { {console_text(locale, "共享", "Sharing")} }
-                                    th { {console_text(locale, "访问结果", "Decision")} }
-                                    th { {console_text(locale, "详情", "Details")} }
+                                    th { scope: "col", class: "access-matrix-corner",
+                                        strong { {console_text(locale, "当前来源", "Current source")} }
+                                        small { {console_text(locale, "点击结果查看原因", "Select a result to review")} }
+                                    }
+                                    for resource in &page.items {
+                                        th { scope: "col",
+                                            span { class: "access-kind", {resource_kind_label(locale, &resource.kind)} }
+                                            strong { "{resource.name}" }
+                                            small { "{resource.target}" }
+                                        }
+                                    }
                                 }
                             }
                             tbody {
-                                for resource in &page.items {
-                                    tr { class: if focused_resource() == resource.id.to_string() { "focused-row" } else { "" },
-                                        td {
-                                            small { class: "mobile-cell-label", {console_text(locale, "共享", "Sharing")} }
-                                            strong { "{resource.name}" }
-                                            p { class: "muted", "{resource.target}" }
-                                        }
-                                        if let Some(cell) = result
-                                            .read()
-                                            .as_ref()
-                                            .and_then(|r| r.as_ref().ok())
-                                            .and_then(|m| m.cells.iter().find(|c| c.id == resource.id))
-                                        {
-                                            td {
-                                                small { class: "mobile-cell-label", {console_text(locale, "访问结果", "Decision")} }
-                                                span { class: format!("decision-chip {}", cell.outcome),
-                                                    { matrix_outcome(locale,& cell.outcome) }
-                                                }
-                                                if cell.outcome == "conditions" {
-                                                    small { class: "decision-note", {console_text(locale, "需指定具体目标条件", "A specific target condition is required")} }
-                                                } else if cell.sources > 1 {
-                                                    small { class: "decision-note",
-                                                        {format!("{} / {} {}", cell.allowed_sources, cell.sources, console_text(locale, "来源允许", "sources allowed"))}
-                                                    }
-                                                }
-                                            }
-                                            td {
-                                                small { class: "mobile-cell-label", {console_text(locale, "详情", "Details")} }
+                                tr {
+                                    th { scope: "row", class: "access-matrix-source",
+                                        span { class: "access-kind", {if source().starts_with("group:") { console_text(locale,"设备组","Group") } else { console_text(locale,"设备","Device") }} }
+                                        strong { "{source_label}" }
+                                    }
+                                    for resource in &page.items {
+                                        td { class: if focused_resource() == resource.id.to_string() { "focused-cell" } else { "" },
+                                            if let Some(cell) = result.read().as_ref().and_then(|r| r.as_ref().ok())
+                                                .and_then(|m| m.cells.iter().find(|c| c.id == resource.id)) {
                                                 button {
-                                                    class: "secondary-button",
+                                                    class: format!("access-matrix-cell {}", cell.outcome),
+                                                    "data-console-dismiss": "true",
+                                                    aria_label: format!("{} · {} · {}", resource.name, matrix_outcome(locale, &cell.outcome), console_text(locale,"查看原因","Review reason")),
+                                                    aria_pressed: selected().is_some_and(|item| item.id == resource.id).to_string(),
                                                     onclick: {
                                                         let resource = resource.clone();
-                                                        let cell = cell.clone();
-                                                        move |_| {
-                                                            selected_result.set(Some(cell.clone()));
-                                                            selected.set(Some(resource.clone()));
-                                                        }
+                                                        move |_| selected.set(Some(resource.clone()))
                                                     },
-                                                    {console_text(locale, "查看原因", "Review reason")}
+                                                    span { class: "access-decision-icon", aria_hidden: "true",
+                                                        dangerous_inner_html: match cell.outcome.as_str() {
+                                                            "allowed" => include_str!("../assets/icons/check-lg.svg"),
+                                                            "denied" => include_str!("../assets/icons/dash.svg"),
+                                                            _ => include_str!("../assets/icons/exclamation.svg"),
+                                                        }
+                                                    }
+                                                    span {
+                                                        strong { {matrix_outcome(locale,&cell.outcome)} }
+                                                        if cell.sources > 1 {
+                                                            small { "{cell.allowed_sources} / {cell.sources}" }
+                                                        }
+                                                    }
                                                 }
-                                            }
-                                        } else {
-                                            td {
-                                                small { class: "mobile-cell-label", {console_text(locale, "访问结果", "Decision")} }
-                                                {console_text(locale, "正在计算…", "Evaluating…")}
-                                            }
-                                            td {
-                                                small { class: "mobile-cell-label", {console_text(locale, "详情", "Details")} }
-                                                "—"
+                                            } else {
+                                                span { class: "access-matrix-pending", {console_text(locale,"正在计算…","Evaluating…")} }
                                             }
                                         }
                                     }
@@ -527,6 +580,7 @@ fn ConsoleAccessPanel(
                             }
                         }
                     }
+
                     div { class: "actions",
                         if !cursor().is_empty() {
                             button {
@@ -567,26 +621,57 @@ fn ConsoleAccessPanel(
                     }
                 }
             }
-        }
-        if let Some(resource) = selected() {
-            ConsoleOverlay {
-                title: console_text(locale, "访问详情", "Access details"),
-                on_close: move |()| {
-                    selected.set(None);
-                    selected_result.set(None);
-                    result.restart();
-                },
-                ConsoleAccessDetail {
-                    key: "{mesh}:{resource.id}",
-                    mesh: mesh.clone(),
-                    resource,
-                    initial_result: selected_result(),
-                    source: parse_console_source(&source()),
-                    locale,
-                    csrf: csrf.clone(),
-                    can_write,
+            div { class: "access-matrix-legend",
+                for (kind, zh, en, icon) in [
+                    ("allowed", "可以访问", "Allowed", include_str!("../assets/icons/check-lg.svg")),
+                    ("denied", "默认阻止", "Blocked by default", include_str!("../assets/icons/dash.svg")),
+                    ("conditions", "有需要关注的情况", "Needs attention", include_str!("../assets/icons/exclamation.svg")),
+                ] {
+                    span { class: "{kind}", i { class:"access-decision-icon", aria_hidden:"true", dangerous_inner_html:icon } {console_text(locale,zh,en)} }
                 }
             }
+        }
+        div { class: "access-workbench",
+            section { class: "card access-detail-panel", aria_label: console_text(locale,"访问详情","Access details"),
+                div { class: "panel-head",
+                    div {
+                        h2 { {console_text(locale,"访问详情","Access details")} }
+                        p { class: "muted", {console_text(locale,"选择上方一个结果，这里会用自然语言解释为什么允许或阻止。","Select a result above for an explanation of why access is allowed or blocked.")} }
+                    }
+                    span { class: "access-detail-context", {selected().map(|r| r.name).unwrap_or_else(|| console_text(locale,"尚未选择","Not selected").into())} }
+                }
+                if let Some(resource) = selected() {
+                    ConsoleAccessDetail {
+                        key: "{mesh}:{source}:{resource.id}", mesh: mesh.clone(), resource,
+                        initial_result: current_result, source: parse_console_source(&source()), locale,
+                        csrf: csrf.clone(), can_write,
+                        on_change: move |()| result.restart(),
+                    }
+                } else {
+                    div { class: "access-detail-empty",
+                        span { class: "access-empty-icon", aria_hidden: "true", dangerous_inner_html: include_str!("../assets/icons/arrow-up-left.svg") }
+                        strong { {console_text(locale,"选择一个访问结果","Select an access result")} }
+                        p { {console_text(locale,"这里会显示最终决定、命中的授权和当前路径状态。","Review the final decision, matching grants and path status here.")} }
+                    }
+                }
+            }
+            if let Some(resource) = selected() {
+                ConsoleAccessSimulation { key: "{mesh}:{source}:{resource.id}", mesh:mesh.clone(), resource, source:parse_console_source(&source()), locale }
+            } else {
+                details { class: "card access-simulator-panel",
+                    summary {
+                        strong { {console_text(locale,"高级：模拟具体条件","Advanced: simulate specific conditions")} }
+                        small { {console_text(locale,"需要排查协议、端口或具体条件时再展开。","Expand to inspect protocols, ports or specific conditions.")} }
+                    }
+                    p { class:"muted", {console_text(locale,"先选择访问来源，再点击一个共享的访问结果。","Select an access source and a share’s result first.")} }
+                }
+            }
+        }
+        if grant_open() && can_write {
+            ConsoleOverlay { title: console_text(locale,"添加授权","Add grant"), on_close: move |()| grant_open.set(false),
+                ConsoleAccessGrant { mesh:mesh.clone(), locale, csrf:csrf.clone(), initial_source:source(), initial_resource:selected(), on_change:move |()| { *CONSOLE_QUERY_EPOCH.write() += 1; } }
+            }
+        }
         }
     }
 }

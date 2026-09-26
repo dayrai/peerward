@@ -17,8 +17,8 @@ fn console_page_description(locale: Locale, route: ConsoleRoute) -> &'static str
         ),
         ConsoleRoute::Policy => console_text(
             locale,
-            "查看设备或设备组能访问哪些共享，并按需调整权限。",
-            "Review which shares a device or group can access, then adjust permissions when needed.",
+            "查看设备或设备组可以使用哪些共享，并按需调整授权。没有明确允许的访问默认阻止。",
+            "Review which shares a device or group can use and adjust grants. Access without an explicit allow is blocked by default.",
         ),
         ConsoleRoute::Operations => console_text(
             locale,

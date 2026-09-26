@@ -8,32 +8,9 @@ fn ConsoleAccessDetail(
     locale: Locale,
     csrf: Option<String>,
     can_write: bool,
+    on_change: EventHandler<()>,
 ) -> Element {
-    let mut address = use_signal(String::new);
-    let mut gateway = use_signal(String::new);
-    let mut protocol = use_signal(|| "6".to_owned());
-    let mut service_protocol = use_signal(String::new);
-    let mut port = use_signal(|| "443".to_owned());
-    let mut submitted = use_signal(|| None::<peerward_api::ConsoleMatrixQuery>);
-    let mut message = use_signal(String::new);
-    let bindings = use_console_query::<Value>(if resource.kind == "service" {
-        String::new()
-    } else {
-        format!(
-            "/api/v1/meshes/{mesh}/network-resources/{}/health",
-            resource.id
-        )
-    });
-    let mut result = use_console_post::<peerward_api::ConsoleMatrix>(
-        if submitted().is_some() {
-            format!("/api/v1/meshes/{mesh}/console/matrix")
-        } else {
-            String::new()
-        },
-        json!(submitted()),
-    );
-    let form_resource = resource.clone();
-    let form_source = source.clone();
+    let mut grants_refresh = use_signal(|| 0_u64);
     rsx! {
         h2 { "{resource.name}" }
         p { class: "muted", "{resource.target}" }
@@ -42,8 +19,8 @@ fn ConsoleAccessDetail(
                 {
                     console_text(
                         locale,
-                        "请先关闭此窗口，在访问页面选择来源设备或组。",
-                        "Close this drawer and select a source device or group first.",
+                        "请先选择来源设备或设备组。",
+                        "Select a source device or group first.",
                     )
                 }
             }
@@ -88,7 +65,8 @@ fn ConsoleAccessDetail(
             locale,
             csrf: csrf.clone(),
             can_write,
-            on_change: move |()| result.restart(),
+            refresh: grants_refresh(),
+            on_change: move |()| { grants_refresh += 1; on_change.call(()); },
         }
         if can_write {
             if let Some(source) = source.clone() {
@@ -98,12 +76,51 @@ fn ConsoleAccessDetail(
                     source,
                     locale,
                     csrf: csrf.clone(),
-                    on_change: move |()| result.restart(),
+                    on_change: move |()| { grants_refresh += 1; on_change.call(()); },
                 }
             }
         }
-        details { class: "advanced-tools access-simulation",
-            summary { {console_text(locale, "高级：模拟具体条件", "Advanced: simulate specific conditions")} }
+    }
+}
+
+#[component]
+fn ConsoleAccessSimulation(
+    mesh: String,
+    resource: peerward_api::ConsoleSharingResource,
+    source: Option<peerward_api::ConsoleGrantSource>,
+    locale: Locale,
+) -> Element {
+    let mut address = use_signal(String::new);
+    let mut gateway = use_signal(String::new);
+    let mut protocol = use_signal(|| "6".to_owned());
+    let mut service_protocol = use_signal(String::new);
+    let mut port = use_signal(|| "443".to_owned());
+    let mut submitted = use_signal(|| None::<peerward_api::ConsoleMatrixQuery>);
+    let mut message = use_signal(String::new);
+    let bindings = use_console_query::<Value>(if resource.kind == "service" {
+        String::new()
+    } else {
+        format!(
+            "/api/v1/meshes/{mesh}/network-resources/{}/health",
+            resource.id
+        )
+    });
+    let mut result = use_console_post::<peerward_api::ConsoleMatrix>(
+        if submitted().is_some() {
+            format!("/api/v1/meshes/{mesh}/console/matrix")
+        } else {
+            String::new()
+        },
+        json!(submitted()),
+    );
+    let form_resource = resource.clone();
+    let form_source = source.clone();
+    rsx! {
+        details { class: "card access-simulator-panel access-simulation",
+            summary {
+                strong { {console_text(locale, "高级：模拟具体条件", "Advanced: simulate specific conditions")} }
+                small { {console_text(locale,"需要排查协议、端口或具体条件时再展开。","Expand to inspect protocols, ports or specific conditions.")} }
+            }
             p { class: "muted",
                 {console_text(locale, "只有需要核对具体地址、协议、端口或网关时才使用。它解释访问规则判断，不代表真实连通性。", "Use this only when you need to evaluate a specific address, protocol, port, or gateway. It explains access-rule evaluation and does not prove connectivity.")}
             }

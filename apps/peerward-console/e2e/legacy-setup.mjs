@@ -24,6 +24,7 @@ export async function openAdvancedTools(page) {
   if (url.pathname === "/peers" && !await page.getByRole("button", { name: label, exact: true }).isVisible()) {
     await page.locator(".device-more > summary").click();
   }
+  if (url.pathname === '/policy') await page.locator('#advanced-access > summary').click();
   await page.getByRole('button', { name: label, exact: true }).click();
   await expect(page.getByRole('dialog', { name: dialogName, exact: true })).toBeVisible();
   if (url.pathname === '/policy') await page.getByText('Resource rules and device groups', { exact: true }).click();

@@ -55,6 +55,6 @@ if [[ ${PEERWARD_CONSOLE_UPDATE_SNAPSHOTS:-} == 1 ]]; then filters+=(--update-sn
 if [[ -n ${PEERWARD_CONSOLE_E2E_GREP:-} ]]; then filters+=(--grep "$PEERWARD_CONSOLE_E2E_GREP"); fi
 PEERWARD_CONSOLE_E2E_URL="http://127.0.0.1:$console_port" PEERWARD_NETWORK_MANAGEMENT_E2E=1 PEERWARD_CONSOLE_V14_E2E=1 PEERWARD_DEVICE_DETAILS_E2E=1 \
   PEERWARD_EVIDENCE_SCREENSHOT_DIR="${PEERWARD_EVIDENCE_SCREENSHOT_DIR:-$workspace/artifacts/console-v14/screenshots}" \
-  npx playwright test policy-editor.spec.mjs console-v14.spec.mjs sharing-prototype.spec.mjs sharing-edit.spec.mjs device-prototype.spec.mjs prototype-pages.spec.mjs network-management.spec.mjs controlled-enrollment.spec.mjs guided-enrollment.spec.mjs enrollment-prototype.spec.mjs \
+  npx playwright test access-prototype.spec.mjs policy-editor.spec.mjs console-v14.spec.mjs sharing-prototype.spec.mjs sharing-edit.spec.mjs device-prototype.spec.mjs prototype-pages.spec.mjs network-management.spec.mjs controlled-enrollment.spec.mjs guided-enrollment.spec.mjs enrollment-prototype.spec.mjs \
     client-upgrade.spec.mjs device-details.spec.mjs event-recovery.spec.mjs \
     mesh-delete.spec.mjs mesh-provisioning.spec.mjs peer-delete.spec.mjs visual.spec.mjs --reporter=line "${filters[@]}"

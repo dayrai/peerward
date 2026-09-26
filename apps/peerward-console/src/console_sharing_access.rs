@@ -2,13 +2,14 @@
 #[allow(unused_mut)]
 fn ConsoleSharingAccess(
     mesh: String,
+    #[props(default)] initial_source: String,
     resource: peerward_api::ConsoleSharingResource,
     locale: Locale,
     csrf: Option<String>,
     can_write: bool,
     on_change: EventHandler<()>,
 ) -> Element {
-    let mut source = use_signal(String::new);
+    let mut source = use_signal(|| initial_source);
     let mut source_name = use_signal(String::new);
     let mut query = use_signal(String::new);
     let mut device_cursor = use_signal(String::new);

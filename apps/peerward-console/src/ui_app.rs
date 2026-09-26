@@ -144,19 +144,21 @@ fn Workflow(
             }
         },
         ConsoleRoute::Policy => rsx! {
-            section { class: "card policy-entry",
-                div {
-                    h2 { {console_text(locale,"设备之间的通信","Communication between devices")} }
-                    p { class:"muted", {console_text(locale,"让两台设备互相 Ping，或允许 SSH、网页等连接。选择设备后保存即可。","Allow Ping, SSH or web connections between devices. Choose the devices, then save.")} }
+            ConsoleAccessPanel{requested_resource,requested_source,mesh:snapshot.mesh_id.clone(),mesh_name:snapshot.mesh_name.clone(),locale,csrf:snapshot.csrf_token.clone(),can_write:can_write}
+            details { class: "card access-advanced-rules", id: "advanced-access",
+                summary {
+                    strong { {console_text(locale,"高级：查看底层规则","Advanced: underlying rules")} }
+                    small { {console_text(locale,"适合排查优先级、规则来源和高级策略；普通操作无需进入这里。","Inspect priorities, rule sources and advanced policies when needed.")} }
                 }
-                button { class:"primary-button", disabled:!browser_ready(), onclick:move |_| advanced_open.set(true),
-                    {if can_write {console_text(locale,"配置设备互通","Configure device access")} else {console_text(locale,"查看通信规则","View communication rules")}}
-                }
-            }
-            ConsoleAccessPanel{requested_resource,requested_source,mesh:snapshot.mesh_id.clone(),locale,csrf:snapshot.csrf_token.clone(),can_write:can_write}
-            div { class: "advanced-entryline", id: "advanced-access",
-                button { class: "text-link", onclick: move |_| advanced_open.set(true),
-                    if can_write { {console_text(locale,"高级访问工具…","Advanced access tools…")} } else { {console_text(locale,"高级访问信息…","Advanced access information…")} }
+                div { class: "access-advanced-body",
+                    p { class:"info-note", {console_text(locale,"上面的矩阵显示最终生效结果。底层策略仍按规则顺序计算；修改后请重新检查访问结果。","The matrix shows the effective result. Policies are evaluated in rule order; check access again after changes.")} }
+                    ConsoleAccessRules { mesh: snapshot.mesh_id.clone(), locale }
+                    button { class:"secondary-button", disabled:!browser_ready(), onclick:move |_| advanced_open.set(true),
+                        {if can_write {console_text(locale,"配置设备互通","Configure device access")} else {console_text(locale,"查看通信规则","View communication rules")}}
+                    }
+                    button { class: "text-link", onclick: move |_| advanced_open.set(true),
+                        if can_write { {console_text(locale,"高级访问工具…","Advanced access tools…")} } else { {console_text(locale,"高级访问信息…","Advanced access information…")} }
+                    }
                 }
             }
             if advanced_open() {
@@ -243,6 +245,7 @@ include!("console_enrollment_groups.rs");
 include!("console_retire.rs");
 
 include!("console_access_detail.rs");
+include!("console_access_grant.rs");
 include!("console_sharing_draft.rs");
 include!("interactive_mutation.rs");
 include!("console_errors.rs");

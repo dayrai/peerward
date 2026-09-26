@@ -333,7 +333,7 @@ fn ConsoleShell(
                     "data-console-ready": hydrated().to_string(),
                     aria_busy: (!
                             hydrated()).to_string(),
-                    if !matches!(route, ConsoleRoute::Peers | ConsoleRoute::JoinTickets) || mesh.is_empty() {
+                    if !matches!(route, ConsoleRoute::Peers | ConsoleRoute::JoinTickets | ConsoleRoute::Policy) || mesh.is_empty() {
                     div { class: "page-head",
                         div {
                             div { class: "eyebrow",

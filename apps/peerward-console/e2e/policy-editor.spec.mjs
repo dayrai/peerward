@@ -18,6 +18,7 @@ async function open(page) {
   const mesh = base.split('/').at(-1);
   await page.goto(`${origin}/policy?mesh=${mesh}`);
   await expect(page.locator('main')).toHaveAttribute('data-console-ready', 'true');
+  await page.locator('#advanced-access > summary').click();
   await page.getByRole('button', { name: '配置设备互通', exact: true }).click();
   await expect(page.getByRole('dialog', { name: '访问规则', exact: true })).toBeVisible();
   await expect(page.locator('.policy-savebar')).toContainText('所有规则已保存');
@@ -67,7 +68,7 @@ test('policy editor selects two devices, validates without saving, saves both di
   await capture(page, 'policy-editor-loaded-zh');
   await addPing(page);
   await capture(page, 'policy-editor-draft-zh');
-  await expect(page.locator('.policy-summary-row')).toHaveCount(baseline.rules.length + 2);
+  await expect(page.locator('.policy-workspace .policy-summary-row')).toHaveCount(baseline.rules.length + 2);
   await page.getByRole('button', { name: '仅校验', exact: true }).click();
   await expect(page.locator('.policy-savebar')).toContainText('校验通过，尚未保存');
   expect(await current(page)).toEqual(baseline);
@@ -87,8 +88,9 @@ test('policy editor selects two devices, validates without saving, saves both di
   await capture(page, 'policy-editor-saved-zh');
   await expect(page.getByRole('button', { name: '保存规则', exact: true })).toBeDisabled();
   await page.reload();
+  await page.locator('#advanced-access > summary').click();
   await page.getByRole('button', { name: '配置设备互通', exact: true }).click();
-  await expect(page.locator('.policy-summary-row')).toHaveCount(saved.rules.length);
+  await expect(page.locator('.policy-workspace .policy-summary-row')).toHaveCount(saved.rules.length);
   await expect(page.getByRole('button', { name: '保存规则', exact: true })).toBeDisabled();
 });
 
@@ -140,15 +142,15 @@ test('policy editor retains draft on concurrent update and cannot overwrite newe
   await expect(page.locator('.policy-savebar')).toContainText('草稿已保留');
   expect((await current(page)).revision).toBe(external.revision);
   expect((await current(page)).rules).toEqual(external.rules);
-  await expect(page.locator('.policy-summary-row')).toHaveCount(original.rules.length + 2);
+  await expect(page.locator('.policy-workspace .policy-summary-row')).toHaveCount(original.rules.length + 2);
   await expect(page.getByRole('button', { name: '保存规则', exact: true })).toBeDisabled();
   await capture(page, 'policy-editor-conflict-zh');
   await page.getByRole('button', { name: '重新加载', exact: true }).click();
   await page.getByRole('button', { name: '继续编辑', exact: true }).click();
-  await expect(page.locator('.policy-summary-row')).toHaveCount(original.rules.length + 2);
+  await expect(page.locator('.policy-workspace .policy-summary-row')).toHaveCount(original.rules.length + 2);
   await page.getByRole('button', { name: '重新加载', exact: true }).click();
   await page.getByRole('button', { name: '放弃并重新加载', exact: true }).click();
-  await expect(page.locator('.policy-summary-row')).toHaveCount(original.rules.length);
+  await expect(page.locator('.policy-workspace .policy-summary-row')).toHaveCount(original.rules.length);
 });
 
 test('policy editor reports failed validation and transport failure without clearing the draft', async ({ page }) => {
@@ -161,6 +163,6 @@ test('policy editor reports failed validation and transport failure without clea
   await page.route('**/policy', route => route.request().method() === 'PUT' ? route.abort('failed') : route.continue());
   await page.getByRole('button', { name: '保存规则', exact: true }).click();
   await expect(page.locator('.policy-savebar [role=alert]')).toBeVisible();
-  await expect(page.locator('.policy-summary-row')).toHaveCount(original.rules.length + 2);
+  await expect(page.locator('.policy-workspace .policy-summary-row')).toHaveCount(original.rules.length + 2);
   expect(await current(page)).toEqual(original);
 });
