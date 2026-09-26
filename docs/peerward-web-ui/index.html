@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Peerward · 网络管理</title>
+  <meta name="description" content="Peerward 单管理员网络管理界面原型" />
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-row">
+        <div class="logo-mark">P</div>
+        <div>
+          <div class="brand">Peerward</div>
+          <div class="brand-sub">网络管理</div>
+        </div>
+      </div>
+
+      <section class="network-card" id="networkCard">
+        <div class="network-label">当前网络</div>
+        <button class="network-switch" id="networkSwitch" aria-haspopup="listbox" aria-expanded="false">
+          <span class="network-switch-copy">
+            <span class="network-avatar home" id="sidebarNetworkAvatar">⌂</span>
+            <span>
+              <strong id="sidebarNetworkName">家庭网络</strong>
+            </span>
+          </span>
+          <span class="chev">⌄</span>
+        </button>
+        <div class="network-links">
+          <a class="text-link" id="sidebarNetworkLink" href="#network" data-route="network">网络设置</a>
+        </div>
+        <div class="network-menu" id="networkMenu" role="listbox" hidden>
+          <div class="network-menu-head"><strong>切换网络</strong><small>设备、共享和权限彼此隔离</small></div>
+          <div class="network-menu-search">⌕ <input id="networkMenuSearch" placeholder="搜索网络" /></div>
+          <div class="network-menu-list" id="networkMenuList"></div>
+          <div class="network-menu-foot"><button class="link-btn" id="manageNetworksBtn">管理所有网络</button><button class="primary-btn small" id="newNetworkQuickBtn">＋ 新建</button></div>
+        </div>
+      </section>
+
+      <nav class="main-nav" aria-label="主要导航">
+        <a href="#dashboard" data-route="dashboard" class="nav-item active"><span class="nav-icon">⌂</span><span>概览</span></a>
+        <a href="#devices" data-route="devices" class="nav-item"><span class="nav-icon">▣</span><span>设备</span></a>
+        <a href="#sharing" data-route="sharing" class="nav-item"><span class="nav-icon">⇄</span><span>共享</span></a>
+        <a href="#policy" data-route="policy" class="nav-item"><span class="nav-icon">✓</span><span>访问</span></a>
+        <a href="#ops" data-route="ops" class="nav-item"><span class="nav-icon">!</span><span>问题与维护</span><span class="badge warn" id="navOpsBadge">2</span></a>
+      </nav>
+
+      <details class="advanced-nav">
+        <summary>系统工具</summary>
+        <a href="#audit" data-route="audit" class="sub-nav"><span>≡</span> 操作记录</a>
+        <a href="#system" data-route="system" class="sub-nav"><span>◇</span> 系统维护</a>
+        <a href="#credentials" class="sub-nav"><span>⌁</span> 凭据与签发机构</a>
+        <a href="#webhooks" class="sub-nav"><span>↗</span> Webhook 与集成</a>
+      </details>
+
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="top-actions">
+          <button class="top-network-chip" id="topNetworkChip" title="切换网络"><span id="topNetworkChipIcon">⌂</span><strong id="topNetworkChipName">家庭网络</strong><i class="dot ok" id="topNetworkChipDot"></i></button>
+          <button class="icon-btn" id="searchBtn" title="全局搜索 · Ctrl/⌘ K" aria-label="全局搜索">⌕</button>
+          <button class="icon-btn notification-btn" id="notificationBtn" title="通知中心" aria-label="通知中心">♢<span class="notification-badge" id="notificationBadge">3</span></button>
+          <button class="admin-session-btn" id="oidcLoginBtn" aria-haspopup="menu" aria-expanded="false"><span class="session-avatar">管</span><span class="session-copy"><strong>管理员</strong><small><i class="dot ok"></i> OIDC 已登录</small></span><span class="chev">⌄</span></button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- Dashboard -->
+        <section class="page active" data-page="dashboard">
+          <div class="first-run-only" id="firstRunDashboard"></div>
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">当前网络</div>
+              <h1 id="dashboardNetworkTitle">家庭网络</h1>
+              <p>网络可以正常使用。这里优先显示需要你决定或处理的事情，其余状态保持安静。</p>
+            </div>
+            <div class="head-actions">
+              <button class="secondary-btn" id="dashboardRunCheckBtn">重新检查</button>
+              <button class="primary-btn" id="dashboardReviewBtn">处理 2 项待办</button>
+            </div>
+          </div>
+
+          <section class="health-banner health-banner-v6 attention" id="dashboardHealthBanner">
+            <div class="health-icon" id="dashboardHealthIcon">!</div>
+            <div class="health-copy">
+              <strong id="dashboardHealthTitle">网络可正常使用</strong>
+              <p id="dashboardHealthText">5 / 6 台设备在线，3 个共享可用；另有 2 项非紧急事项建议处理。</p>
+            </div>
+            <div class="health-meta"><small>上次检查</small><strong id="dashboardLastCheck">刚刚</strong></div>
+          </section>
+
+          <div class="stats-grid dashboard-stats-v6 dashboard-stats-compact dashboard-stats-round8">
+            <article class="stat-card"><div class="stat-label">设备</div><div class="stat-main"><strong id="dashboardOnlineCount">5</strong><span id="dashboardDeviceTotal">/ 6 在线</span></div><div class="stat-foot" id="dashboardDeviceFoot">1 台设备离线</div></article>
+            <article class="stat-card"><div class="stat-label">共享</div><div class="stat-main"><strong id="dashboardShareHealthy">3</strong><span id="dashboardShareTotal">个</span></div><div class="stat-foot positive" id="dashboardShareFoot">设备服务、局域网和出口</div></article>
+          </div>
+
+          <section class="panel dashboard-action-panel">
+            <div class="panel-head">
+              <div><h2>需要处理</h2><p>这里只显示需要人工决定或操作的事项。正常的安全阻止不会算作故障。</p></div>
+              <button class="link-btn" data-route-button="ops">查看全部 ›</button>
+            </div>
+            <div class="dashboard-action-list" id="dashboardActionList" aria-live="polite"></div>
+          </section>
+
+          <section class="section-block dashboard-common-actions">
+            <div class="section-title-row"><div><h2>常用操作</h2><p>只保留最常从首页开始的三件事。</p></div></div>
+            <div class="quick-grid quick-grid-compact">
+              <button class="quick-card" data-route-button="devices"><span class="quick-icon blue">＋</span><span><strong>添加设备</strong><small>生成一次性邀请并确认上线。</small></span><b>›</b></button>
+              <button class="quick-card" data-route-button="sharing"><span class="quick-icon violet">⇄</span><span><strong>添加共享</strong><small>共享设备服务、局域网或互联网出口。</small></span><b>›</b></button>
+              <button class="quick-card" data-route-button="policy"><span class="quick-icon green">✓</span><span><strong>调整访问</strong><small>决定谁可以使用哪个共享。</small></span><b>›</b></button>
+            </div>
+          </section>
+
+          <section class="panel activity-panel dashboard-activity-only">
+            <div class="panel-head"><div><h2>最近活动</h2><p>只保留最近几条变化；底层服务状态平时不占首页空间。</p></div><button class="link-btn" data-route="audit">查看记录</button></div>
+            <div class="timeline" id="dashboardSecurityEvents">
+              <div class="event"><span class="event-icon ok">✓</span><div><strong>测试主机访问 NAS 被阻止</strong><p>没有匹配允许权限，按默认拒绝策略阻止。</p><small>昨天 22:14 · 无需处理</small></div></div>
+              <div class="event"><span class="event-icon ok">✓</span><div><strong>Android 手机访问 SSH 被阻止</strong><p>设备不属于“开发设备”访问范围。</p><small>2 小时前 · 无需处理</small></div></div>
+              <div class="event"><span class="event-icon info">i</span><div><strong>家庭成员访问权限已更新</strong><p>NAS 文件服务的新权限已经生效。</p><small>35 分钟前</small></div></div>
+            </div>
+          </section>
+        </section>
+
+        <!-- Devices -->
+        <section class="page" data-page="devices">
+          <div class="first-run-only" id="firstRunDevices"></div>
+          <div class="page-head">
+            <div><div class="eyebrow">家庭网络</div><h1>设备</h1><p>查看设备是否在线、谁在使用，以及它可以访问哪些共享。</p></div>
+            <div class="head-actions"><details class="round8-more"><summary>更多</summary><button class="link-btn">导出当前结果</button></details><button class="primary-btn" id="addDeviceBtn">＋ 添加设备</button></div>
+          </div>
+
+          <section class="device-join-guide">
+            <div class="guide-copy"><span class="guide-icon">＋</span><div><strong>添加设备只需要一次接入</strong><p>控制台生成一次性邀请；在新设备上使用后，设备会建立自己的长期身份。</p></div></div>
+            <div class="guide-flow" aria-label="设备加入流程"><span><b>1</b>创建设备</span><i>›</i><span><b>2</b>扫码或运行命令</span><i>›</i><span><b>3</b>设备上线</span></div>
+          </section>
+
+          <div class="toolbar">
+            <div class="search-box">⌕ <input placeholder="按名称、IP 或标签搜索设备" /></div>
+            <button class="filter-btn">状态：全部⌄</button><button class="filter-btn">平台：全部⌄</button>
+          </div>
+
+          <section class="panel table-panel">
+            <div class="table-head-row"><h2>全部设备 <span>6</span></h2><div class="legend"><i class="dot ok"></i> 在线 <i class="dot off"></i> 离线</div></div>
+            <div class="device-table">
+              <div class="table-row header"><div>设备</div><div>状态</div><div>地址</div><div>最近连接</div><div>访问范围</div><div></div></div>
+              <div class="table-row device-row" tabindex="0" data-device="办公笔记本"><div class="device-cell"><span class="device-icon">▰</span><span><strong>办公笔记本</strong><small>Linux · 受管设备</small></span></div><div><span class="status-pill good">● 在线</span></div><div><code>10.18.0.12</code></div><div>刚刚</div><div>4 个共享</div><div><button class="row-more" aria-label="查看办公笔记本详情">•••</button></div></div>
+              <div class="table-row device-row" tabindex="0" data-device="Android 手机"><div class="device-cell"><span class="device-icon">▯</span><span><strong>Android 手机</strong><small>Android · 个人设备</small></span></div><div><span class="status-pill good">● 在线</span></div><div><code>10.18.0.21</code></div><div>1 分钟前</div><div>2 个共享</div><div><button class="row-more" aria-label="查看Android 手机详情">•••</button></div></div>
+              <div class="table-row device-row" tabindex="0" data-device="家用 NAS"><div class="device-cell"><span class="device-icon">▤</span><span><strong>家用 NAS</strong><small>Linux · 服务设备</small></span></div><div><span class="status-pill good">● 在线</span></div><div><code>10.18.0.30</code></div><div>3 分钟前</div><div>共享 2 个服务</div><div><button class="row-more" aria-label="查看家用 NAS详情">•••</button></div></div>
+              <div class="table-row device-row" tabindex="0" data-device="家庭网关"><div class="device-cell"><span class="device-icon">◇</span><span><strong>家庭网关</strong><small>Linux · 网关设备</small></span></div><div><span class="status-pill good">● 在线</span></div><div><code>10.18.0.18</code></div><div>8 分钟前</div><div>转发 2 个共享</div><div><button class="row-more" aria-label="查看家庭网关详情">•••</button></div></div>
+              <div class="table-row device-row" tabindex="0" data-device="开发服务器"><div class="device-cell"><span class="device-icon">▤</span><span><strong>开发服务器</strong><small>Linux · 服务设备</small></span></div><div><span class="status-pill good">● 在线</span></div><div><code>10.18.0.40</code></div><div>12 分钟前</div><div>1 个共享</div><div><button class="row-more" aria-label="查看开发服务器详情">•••</button></div></div>
+              <div class="table-row device-row" tabindex="0" data-device="测试主机"><div class="device-cell"><span class="device-icon">▰</span><span><strong>测试主机</strong><small>Linux · 测试设备</small></span></div><div><span class="status-pill neutral">● 离线</span></div><div><code>10.18.0.66</code></div><div>2 小时前</div><div>无</div><div><button class="row-more" aria-label="查看测试主机详情">•••</button></div></div>
+            </div>
+          </section>
+        </section>
+
+        <!-- Sharing / Mesh resources -->
+        <section class="page" data-page="sharing">
+          <div class="first-run-only" id="firstRunSharing"></div>
+          <div class="page-head">
+            <div><div class="eyebrow">当前网络</div><h1>共享</h1><p>用一个入口管理设备服务、局域网资源和互联网出口。访问仍由“访问”页面统一授权。</p></div>
+            <div class="head-actions"><button class="secondary-btn" id="testAllSharesBtn">检查全部共享</button><button class="primary-btn" id="addShareBtn">＋ 添加共享</button></div>
+          </div>
+
+          <section class="panel table-panel sharing-panel">
+            <div class="table-head-row mesh-resource-toolbar">
+              <div><h2>共享 <span id="shareListCount">5</span></h2><p class="table-subtitle">状态分为配置、授权、连接和可达性，避免把“已配置”误认为“现在一定能访问”。</p></div>
+              <div class="sharing-list-tools"><div class="search-box compact">⌕ <input id="shareSearchInput" placeholder="搜索共享、设备或地址" /></div><button class="link-btn" id="refreshShareStatusBtn">刷新状态</button></div>
+            </div>
+            <div class="resource-filter segmented compact" id="resourceTypeFilter" aria-label="共享类型筛选">
+              <button class="active" data-resource-filter="all">全部</button>
+              <button data-resource-filter="service">设备服务</button>
+              <button data-resource-filter="lan">局域网资源</button>
+              <button data-resource-filter="exit">互联网出口</button>
+            </div>
+            <div class="service-list enhanced mesh-resource-list" id="serviceList"></div>
+          </section>
+        </section>
+
+        <!-- Policy -->
+        <section class="page" data-page="policy">
+          <div class="first-run-only" id="firstRunPolicy"></div>
+          <div class="page-head">
+            <div><div class="eyebrow">家庭网络</div><h1>访问</h1><p>查看设备或设备组可以使用哪些共享，并按需调整授权。没有明确允许的访问默认阻止。</p></div>
+            <div class="head-actions"><button class="primary-btn" id="addRuleBtn">＋ 添加授权</button></div>
+          </div>
+          <div class="task-context-bar" id="policyTaskContext" hidden></div>
+
+          <section class="policy-summary policy-summary-v5 round8-policy-default">
+            <div class="policy-default"><span class="shield">✓</span><span><strong>默认拒绝已开启</strong><small>没有明确授权，就不能访问共享。先选来源，再看它对每个共享的最终结果。</small></span></div>
+          </section>
+
+          <section class="panel round8-source-picker">
+            <div class="panel-head"><div><h2>先选择访问来源</h2><p>可以选择单台设备或设备组；搜索只用来缩小候选范围。</p></div></div>
+            <label>设备或设备组<select id="policySourcePicker"></select></label>
+          </section>
+
+          <section class="panel permission-panel">
+            <div class="panel-head permission-head">
+              <div><h2>访问结果</h2><p>只显示当前来源对各共享的最终结果。点击结果查看原因或修改授权。</p></div>
+            </div>
+            <div class="permission-matrix-wrap" id="permissionMatrix" aria-live="polite"></div>
+            <div class="matrix-legend"><span><i class="matrix-key allow">✓</i> 可以访问</span><span><i class="matrix-key deny">–</i> 默认阻止</span><span><i class="matrix-key attention">!</i> 有需要关注的情况</span></div>
+          </section>
+
+          <div class="policy-workbench">
+            <section class="panel policy-detail-panel" id="policyDetailPanel">
+              <div class="panel-head"><div><h2>访问详情</h2><p>选择上方一个结果，这里会用自然语言解释为什么允许或阻止。</p></div><span class="detail-context" id="policyDetailContext">尚未选择</span></div>
+              <div id="policyDetail" class="policy-detail-empty"><span>↖</span><strong>选择一个访问结果</strong><p>这里会显示最终决定、命中的授权和当前路径状态。</p></div>
+            </section>
+
+            <details class="panel simulator-panel round8-simulator" id="policySimulatorPanel">
+              <summary><strong>高级：模拟具体条件</strong><small>需要排查协议、端口或具体条件时再展开。</small></summary>
+              <div class="simulator-form">
+                <label>从哪台设备<select id="simSource"></select></label>
+                <span class="simulator-arrow">→</span>
+                <label>访问哪个共享<select id="simTarget"></select></label>
+                <button class="primary-btn" id="runSimulationBtn">检查访问</button>
+              </div>
+              <div class="simulation-result placeholder" id="simulationResult"><span class="sim-result-icon">?</span><div><strong>选择设备和共享后进行检查</strong><p>模拟只解释策略，不代表真实网络一定可达。</p></div></div>
+            </details>
+          </div>
+
+          <details class="panel advanced-policy" id="advancedPolicyDetails">
+            <summary><span><strong>高级：查看底层规则</strong><small>适合排查优先级、规则来源和高级策略；普通操作无需进入这里。</small></span><span>⌄</span></summary>
+            <div class="advanced-policy-body">
+              <div class="advanced-policy-note"><span>i</span><p>上面的矩阵显示<strong>最终生效结果</strong>。底层策略仍按规则顺序计算，并在没有匹配允许规则时执行“默认拒绝”。</p></div>
+              <div class="rule-list" id="advancedRuleList"></div>
+            </div>
+          </details>
+        </section>
+
+        <!-- Operations -->
+        <section class="page" data-page="ops">
+          <div class="first-run-only" id="firstRunOps"></div>
+          <div class="page-head">
+            <div><div class="eyebrow">家庭网络</div><h1>问题与维护</h1><p>先处理当前网络的问题和连接异常；部署、备份与中继主机维护放到系统工具。</p></div>
+            <div class="head-actions"><button class="secondary-btn" id="opsExportBtn">导出诊断</button><button class="primary-btn" id="opsRefreshBtn">重新检查</button></div>
+          </div>
+
+          <div class="ops-recheck-result" id="opsRecheckResult" role="status" hidden></div>
+
+          <div class="ops-workbench-v6">
+            <section class="panel ops-queue-panel">
+              <div class="panel-head ops-queue-head">
+                <div><h2>待处理事项</h2><p>每项固定说明发生了什么、影响范围和建议下一步，然后直接进入对应对象处理。</p></div>
+                <div class="segment-control ops-filter" id="opsIssueFilter" aria-label="事项筛选">
+                  <button class="active" data-issue-filter="open">待处理 <b id="opsOpenCount">2</b></button>
+                  <button data-issue-filter="known">已知 <b id="opsKnownCount">0</b></button>
+                  <button data-issue-filter="all">全部 <b id="opsAllCount">2</b></button>
+                </div>
+              </div>
+              <div class="ops-issue-queue" id="opsIssueQueue" aria-live="polite"></div>
+              <div class="ops-recovery-guide"><strong>修复后如何确认</strong><p>处理设备、共享或设备身份后回到这里点“重新检查”。事项消失才表示当前证据已恢复；保存配置、重启客户端或发出续期请求本身不算恢复成功。</p></div>
+            </section>
+
+            <section class="panel ops-health-panel mesh-path-panel">
+              <div class="panel-head"><div><h2>当前连接路径</h2><p>这里只显示日常排障需要的在线与连接信息；底层中继细节按需展开。</p></div><span class="status-pill good">● 正常</span></div>
+              <div class="mesh-path-summary">
+                <div><small>在线设备</small><strong>5 / 6</strong><span>台设备</span></div>
+                <div><small>直连优先</small><strong>3</strong><span>条路径</span></div>
+                <div><small>中继备用</small><strong>2</strong><span>台设备</span></div>
+                <div><small>网关资源</small><strong>2</strong><span>个资源</span></div>
+              </div>
+              <div class="ops-health-list compact-health-list">
+                <div><span><i class="dot ok"></i><b>中继连接</b><small>家庭网络 · 当前连接正常</small></span><strong>正常</strong></div>
+                <div><span><i class="dot ok"></i><b>家庭网关</b><small>局域网资源 / 出口路径</small></span><strong>在线</strong></div>
+                <div><span><i class="dot ok"></i><b>托管 DNS</b><small>当前网络名称解析</small></span><strong>正常</strong></div>
+              </div>
+              <button class="secondary-btn full" id="opsRunFullCheckBtn">运行完整健康检查</button>
+              <p class="ops-help">检查会分别验证配置、权限、路径和目标可达性，不会修改网络设置。</p>
+            </section>
+          </div>
+
+          <section class="panel installation-status-card">
+            <div class="panel-head"><div><h2>安装状态</h2><p>控制服务、中继主机和数据库由多个网络共用；没有异常时这里只保留一行确认。</p></div><span class="status-pill good">● 正常</span></div>
+            <div class="installation-status-row"><span><i class="dot ok"></i><b>共享基础设施当前无待处理事项</b><small>只有安装级问题需要人工介入时才会在这里提醒。</small></span><button class="secondary-btn" data-route-button="system">打开系统维护</button></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head"><div><h2>安全活动</h2><p>正常拦截与异常问题分开记录，避免把“已阻止”误认为故障。</p></div><button class="link-btn" data-route-button="policy">查看访问</button></div>
+            <div class="security-event-list" id="opsSecurityFeed">
+              <div class="security-event protected"><span>✓</span><div><strong>测试主机 → 家庭 NAS 文件服务</strong><p>按默认拒绝策略阻止，没有发生未授权访问。</p></div><time>昨天 22:14</time></div>
+              <div class="security-event protected"><span>✓</span><div><strong>Android 手机 → 开发环境 SSH</strong><p>不属于“开发设备”访问范围，规则按预期工作。</p></div><time>2 小时前</time></div>
+            </div>
+          </section>
+        </section>
+
+        <!-- System maintenance -->
+        <section class="page" data-page="system">
+          <div class="page-head">
+            <div><div class="eyebrow">系统工具</div><h1>系统维护</h1><p>管理安装级中继服务、容量、备份、升级和部署诊断。这里的动作可能影响多个网络。</p></div>
+            <div class="head-actions"><button class="secondary-btn" data-route-button="ops">返回问题与维护</button></div>
+          </div>
+          <section class="panel infrastructure-panel">
+            <div class="panel-head"><div><h2>共享基础设施</h2><p>这些组件属于 Peerward 安装，而不是某一个网络。</p></div><span class="status-pill good">● 正常</span></div>
+            <div class="ops-health-list">
+              <div><span><i class="dot ok"></i><b>Control</b><small>API、身份签发与策略</small></span><strong>正常</strong></div>
+              <div><span><i class="dot ok"></i><b>中继主机 #1</b><small>承载多个网络的中继连接</small></span><strong>在线</strong></div>
+              <div><span><i class="dot ok"></i><b>数据库</b><small>配置与状态存储</small></span><strong>正常</strong></div>
+            </div>
+            <div class="infra-note"><span>i</span><p>切换网络不会启动或停止中继主机；维护共享主机前应确认影响范围。</p></div>
+          </section>
+          <details class="advanced-tools ops-advanced-v6" open><summary><span><strong>维护工具</strong><small>部署、容量、备份和升级集中在这里。</small></span><span>⌄</span></summary><div class="advanced-grid"><button>容量与性能</button><button>备份与恢复</button><button>升级与维护</button><button>部署诊断</button></div></details>
+        </section>
+
+        <!-- All networks -->
+        <section class="page" data-page="networks">
+          <div class="page-head">
+            <div><div class="eyebrow">网络</div><h1>所有网络</h1><p>查看并切换你管理的网络。每个网络的设备、共享和访问设置彼此独立。</p></div>
+            <div class="head-actions"><button class="primary-btn" id="createNetworkBtn">＋ 新建网络</button></div>
+          </div>
+          <section class="network-isolation-banner"><span>↔</span><div><strong>每个网络都是独立的安全边界</strong><p>设备、共享、访问权限和运维事件只属于当前网络。切换只是改变你正在查看和操作的范围。</p></div></section>
+          <div class="network-portfolio" id="networkPortfolio"></div>
+        </section>
+
+        <!-- Network settings -->
+        <section class="page" data-page="network">
+          <div class="first-run-only" id="firstRunNetwork"></div>
+          <div class="page-head"><div><div class="eyebrow">设置</div><h1>网络设置</h1><p>管理网络名称、设备加入要求和基础功能。高级配置默认折叠。</p></div><div class="head-actions"><button class="primary-btn" id="saveNetworkSettingsBtn">保存更改</button></div></div>
+          <div class="settings-layout">
+            <section class="panel settings-panel"><h2>基本信息</h2><label>网络名称<input value="家庭网络" /></label><label>网络标识<input value="home-mesh" disabled /></label><p class="field-help">网络标识创建后保持稳定，一般不需要修改。</p><div class="single-admin-hint"><span>✓</span><p><strong>单人管理模式</strong><br>控制台只保留一个管理员身份，不提供成员、角色和邀请功能；设备访问仍由“访问权限”单独控制。</p></div></section>
+            <section class="panel settings-panel"><h2>设备加入</h2><div class="switch-row"><div><strong>要求设备条件</strong><p>只允许符合版本和平台要求的设备加入。</p></div><label class="switch"><input type="checkbox" checked><span></span></label></div><label>最低客户端版本<input value="1.8.0" /></label><label>允许的平台<div class="check-row"><label><input type="checkbox" checked> Linux</label><label><input type="checkbox" checked> Android</label></div></label><p class="field-help">当前 1.0 原型只展示已支持的平台；Windows、macOS、iOS 不作为可加入选项。</p></section>
+            <section class="panel settings-panel"><h2>网络功能</h2><div class="switch-row"><div><strong>托管 DNS</strong><p>让设备可以通过更容易记忆的名称访问服务。</p></div><label class="switch"><input type="checkbox" checked><span></span></label></div><div class="switch-row"><div><strong>资源访问</strong><p>启用共享服务和访问规则功能。</p></div><label class="switch"><input type="checkbox" checked><span></span></label></div></section>
+            <details class="panel advanced-settings"><summary><span><strong>高级设置</strong><small>设备凭据有效期、网络参数和底层配置</small></span><span>⌄</span></summary><div class="advanced-content"><label>设备凭据最短剩余有效期（秒）<input type="number" value="900" /></label><label>内部地址范围<input value="10.18.0.0/16" /></label></div></details>
+            <section class="panel danger-zone"><h2>危险操作</h2><div><span><strong>删除网络</strong><p>删除后设备将无法继续连接，且操作不可撤销。</p></span><button class="danger-btn" id="deleteNetworkBtn">删除网络</button></div></section>
+          </div>
+        </section>
+
+        <!-- Audit -->
+        <section class="page" data-page="audit">
+          <div class="page-head">
+            <div><div class="eyebrow" id="auditEyebrow">家庭网络</div><h1>操作记录</h1><p>记录管理员和系统做过的配置变更。高风险操作会额外保存影响范围和操作原因，方便以后排查。</p></div>
+            <div class="head-actions"><button class="secondary-btn" id="exportAuditBtn">导出操作记录</button></div>
+          </div>
+          <section class="audit-integrity-banner"><span>✓</span><div><strong>操作记录不保存加入凭据、设备私钥或密码原文</strong><p>只记录操作、对象、网络和结果，不把敏感凭据复制进日志。</p></div></section>
+          <div class="audit-stat-grid">
+            <article><small>今天的变更</small><strong id="auditTodayCount">0</strong><span>条</span></article>
+            <article><small>高风险操作</small><strong id="auditHighCount">0</strong><span>条</span></article>
+            <article><small>失败操作</small><strong id="auditDeniedCount">0</strong><span>条</span></article>
+            <article><small>保留时间</small><strong>90</strong><span>天 · 原型策略</span></article>
+          </div>
+          <section class="panel audit-panel">
+            <div class="audit-toolbar">
+              <div class="search-box">⌕ <input id="auditSearch" placeholder="搜索操作、网络或对象" /></div>
+              <select id="auditNetworkFilter"><option value="current">当前网络</option><option value="all">所有网络</option></select>
+              <select id="auditRiskFilter"><option value="all">全部风险</option><option value="high">仅高风险</option><option value="normal">普通操作</option></select>
+            </div>
+            <div class="audit-list" id="auditList"></div>
+          </section>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head"><div><div class="eyebrow">引导操作</div><h2 id="modalTitle">添加设备</h2></div><button class="icon-btn close-modal" aria-label="关闭引导操作">×</button></div>
+      <div class="stepper" id="modalStepper" style="--step-count:3"></div>
+      <div class="modal-body" id="modalBody">
+        <label>设备名称<input id="deviceNameInput" placeholder="例如：小明的笔记本" /></label>
+        <label>设备用途<select><option>个人设备</option><option>受管设备</option><option>服务设备</option><option>测试设备</option></select></label>
+        <p class="field-help">名称只用于管理界面，建议写成一眼能认出的名字。</p>
+      </div>
+      <div class="modal-foot"><button class="secondary-btn close-modal">取消</button><span class="modal-spacer"></span><button class="secondary-btn" id="modalBack" hidden>上一步</button><button class="primary-btn" id="modalNext">下一步</button></div>
+    </div>
+  </div>
+
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="drawer" id="deviceDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true" tabindex="-1">
+    <div class="drawer-head"><div><div class="eyebrow">设备详情</div><h2 id="drawerTitle">办公笔记本</h2></div><button class="icon-btn" id="closeDrawer" aria-label="关闭设备详情">×</button></div>
+    <div class="drawer-body">
+      <div id="drawerSummary"></div>
+      <div class="drawer-tabs object-detail-tabs" id="drawerTabs" role="tablist" aria-label="设备详情分类">
+        <button class="drawer-tab active" id="deviceTabOverview" role="tab" aria-selected="true" aria-controls="drawerTabContent" tabindex="0" data-drawer-tab="overview">状态</button>
+        <button class="drawer-tab" id="deviceTabNetwork" role="tab" aria-selected="false" aria-controls="drawerTabContent" tabindex="-1" data-drawer-tab="network">共享与访问</button>
+        <button class="drawer-tab" id="deviceTabMaintenance" role="tab" aria-selected="false" aria-controls="drawerTabContent" tabindex="-1" data-drawer-tab="maintenance">维护</button>
+      </div>
+      <div id="drawerTabContent" role="tabpanel" aria-labelledby="deviceTabOverview"></div>
+    </div>
+    <div class="drawer-foot round4-hidden"><button class="secondary-btn" id="editDeviceBtn">编辑设备</button><button class="danger-text-btn" id="disableDeviceBtn">停用设备</button></div>
+  </aside>
+
+  <div class="drawer-backdrop" id="serviceDrawerBackdrop" hidden></div>
+  <aside class="drawer service-drawer" id="serviceDrawer" role="dialog" aria-modal="true" aria-labelledby="serviceDrawerTitle" aria-hidden="true" tabindex="-1">
+    <div class="drawer-head"><div><div class="eyebrow" id="serviceDrawerEyebrow">共享详情 · 设备服务</div><h2 id="serviceDrawerTitle">家庭 NAS 文件服务</h2></div><button class="icon-btn" id="closeServiceDrawer" aria-label="关闭共享详情">×</button></div>
+    <div class="drawer-body">
+      <div id="serviceDrawerSummary"></div>
+      <div class="drawer-tabs service-tabs object-detail-tabs" id="serviceDrawerTabs" role="tablist" aria-label="共享详情分类">
+        <button class="drawer-tab active" id="serviceTabOverview" role="tab" aria-selected="true" aria-controls="serviceDrawerTabContent" tabindex="0" data-service-tab="overview">状态</button>
+        <button class="drawer-tab" id="serviceTabSettings" role="tab" aria-selected="false" aria-controls="serviceDrawerTabContent" tabindex="-1" data-service-tab="settings">设置</button>
+        <button class="drawer-tab" id="serviceTabPath" role="tab" aria-selected="false" aria-controls="serviceDrawerTabContent" tabindex="-1" data-service-tab="path">网关路径</button>
+      </div>
+      <div id="serviceDrawerTabContent" role="tabpanel" aria-labelledby="serviceTabOverview"></div>
+    </div>
+    <div class="drawer-foot service-drawer-foot round4-hidden"><button class="secondary-btn" id="editShareBtn">编辑资源</button><button class="danger-text-btn" id="pauseShareBtn">暂停资源</button></div>
+  </aside>
+
+  <div class="modal-backdrop" id="networkCreateBackdrop" hidden>
+    <div class="modal network-create-modal" role="dialog" aria-modal="true" aria-labelledby="networkCreateTitle">
+      <div class="modal-head"><div><div class="eyebrow">新建网络</div><h2 id="networkCreateTitle">创建网络</h2></div><button class="icon-btn" id="closeNetworkCreate" aria-label="关闭新建网络">×</button></div>
+      <div class="modal-body">
+        <div class="network-create-note"><span>i</span><p>新网络不会自动继承当前网络的设备、共享或访问权限。这样可以避免家庭、公司和测试环境互相影响。</p></div>
+        <label>网络名称<input id="newNetworkName" placeholder="例如：办公室网络" value="办公室网络" /></label>
+        <label>网络标识<input id="newNetworkId" placeholder="例如：office-mesh" value="office-mesh" /></label>
+        <p class="field-help">标识建议使用小写字母、数字和连字符；创建后一般保持不变。</p>
+      </div>
+      <div class="modal-foot"><button class="secondary-btn" id="cancelNetworkCreate">取消</button><span class="modal-spacer"></span><button class="primary-btn" id="confirmNetworkCreate">创建并切换</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop risk-backdrop" id="riskBackdrop" hidden>
+    <div class="modal risk-modal" role="alertdialog" aria-modal="true" aria-labelledby="riskTitle">
+      <div class="risk-modal-head"><span class="risk-symbol" id="riskSymbol">!</span><div><div class="eyebrow" id="riskEyebrow">高风险操作</div><h2 id="riskTitle">确认操作</h2></div><button class="icon-btn" id="closeRiskModal" aria-label="关闭确认窗口">×</button></div>
+      <div class="modal-body">
+        <p class="risk-summary" id="riskSummary"></p>
+        <div class="risk-facts" id="riskFacts"></div>
+        <label>操作原因（可选）<textarea id="riskReason" rows="2" placeholder="例如：设备丢失、服务维护、人员离职"></textarea></label>
+        <div class="risk-confirm-phrase" id="riskConfirmPhrase" hidden><label>请输入 <strong id="riskPhraseLabel"></strong> 以确认<input id="riskPhraseInput" autocomplete="off" /></label></div>
+      </div>
+      <div class="modal-foot"><button class="secondary-btn" id="cancelRiskModal">取消</button><span class="modal-spacer"></span><button class="danger-btn" id="confirmRiskAction">确认操作</button></div>
+    </div>
+  </div>
+
+
+  <!-- v12: global search -->
+  <div class="command-backdrop" id="commandBackdrop" hidden>
+    <section class="command-palette" role="dialog" aria-modal="true" aria-labelledby="commandTitle">
+      <h2 class="sr-only" id="commandTitle">全局搜索</h2>
+      <div class="command-search-row"><span>⌕</span><input id="globalSearchInput" autocomplete="off" placeholder="搜索设备、共享、网络或功能…" aria-label="全局搜索"/><kbd>Esc</kbd></div>
+      <div class="command-context" id="commandContext"><span class="context-dot"></span><strong>当前网络：家庭网络</strong><small>搜索会优先显示当前网络对象，也可以直接切换网络。</small></div>
+      <div class="command-results" id="commandResults" role="listbox"></div>
+      <div class="command-footer"><span><kbd>↑</kbd><kbd>↓</kbd> 选择</span><span><kbd>Enter</kbd> 打开</span><span><kbd>Ctrl/⌘ K</kbd> 随时搜索</span></div>
+    </section>
+  </div>
+
+  <!-- v12: notification center -->
+  <div class="drawer-backdrop notification-backdrop" id="notificationBackdrop" hidden></div>
+  <aside class="notification-drawer" id="notificationDrawer" role="dialog" aria-modal="true" aria-labelledby="notificationTitle" aria-hidden="true" tabindex="-1">
+    <div class="notification-head"><div><div class="eyebrow">通知</div><h2 id="notificationTitle">最近需要关注</h2><p>待处理事项优先；正常安全活动归为信息。</p></div><button class="icon-btn" id="closeNotificationBtn" aria-label="关闭通知中心">×</button></div>
+    <div class="notification-toolbar"><div class="segmented compact" id="notificationScope"><button class="active" data-notification-scope="all">所有网络</button><button data-notification-scope="current">当前网络</button></div><button class="link-btn" id="markAllNotificationsRead">全部标为已读</button></div>
+    <div class="notification-list" id="notificationList"></div>
+    <div class="notification-foot"><span>需要进一步处理时，可进入“问题与维护”。</span><button class="secondary-btn small" id="openOpsFromNotifications">查看问题与维护</button></div>
+  </aside>
+
+  <!-- v12: single-admin session menu -->
+  <div class="admin-menu" id="adminMenu" role="menu" hidden>
+    <div class="admin-menu-profile"><span class="session-avatar large">管</span><div><strong>管理员</strong><small>单人管理模式</small></div><span class="status-pill good">● 已认证</span></div>
+    <div class="admin-session-facts"><div><small>登录方式</small><strong>OIDC</strong></div><div><small>会话</small><strong>受保护 · 7 小时后到期</strong></div></div>
+    <div class="admin-menu-note"><span>i</span><p>Peerward 只有一个控制台管理员。设备是否能访问共享，仍由“访问”单独决定。</p></div>
+    <div class="admin-preferences"><small>显示与语言</small><div><button class="secondary-btn small" id="themeBtn" title="切换主题">◐ 切换明暗</button><button class="select-btn">简体中文⌄</button></div></div>
+    <button class="admin-menu-action" id="reauthAdminBtn"><span>↻</span><span><strong>重新验证身份</strong><small>正式版跳转到 OIDC 身份提供方</small></span></button>
+    <button class="admin-menu-action prototype-action" id="firstRunPreviewBtn"><span>◇</span><span><strong>体验首次设置</strong><small>原型工具 · 查看全新网络的引导流程</small></span></button>
+    <button class="admin-menu-action" id="lockConsoleBtn"><span>⌾</span><span><strong>锁定控制台</strong><small>离开电脑时暂时隐藏管理界面</small></span></button>
+  </div>
+
+  <div class="lock-screen" id="lockScreen" hidden>
+    <div class="lock-card"><div class="lock-logo">P</div><div class="eyebrow">Peerward 网络管理</div><h1>管理界面已锁定</h1><p>网络仍会继续运行。解锁只恢复管理界面，不会影响设备连接和共享。</p><div class="lock-admin"><span class="session-avatar">管</span><div><strong>管理员</strong><small>OIDC 单人管理会话</small></div></div><button class="primary-btn" id="unlockConsoleBtn">使用 OIDC 解锁</button><small class="lock-help">交互原型：不会真的跳转到身份提供方。</small></div>
+  </div>
+
+  <div class="toast" id="toast" hidden>操作已保存</div>
+  <script src="app.js"></script>
+</body>
+</html>
